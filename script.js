@@ -27,10 +27,20 @@ window.onload = () => {
     if(localStorage.getItem('theme') === 'dark') document.body.setAttribute('data-theme', 'dark');
 };
 
+function escapeHTML(str) {
+    return String(str).replace(/[&<>'"]/g, function(match) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[match];
+    });
+}
+
+function triggerVibrate(ms) {
+    if (navigator.vibrate) {
+        navigator.vibrate(ms);
+    }
+}
+
 function loadData() {
-    let saved = localStorage.getItem('sushi_log_v23_data');
-    if (!saved) saved = localStorage.getItem('sushi_log_v22_data'); 
-    
+    let saved = localStorage.getItem('sushi_log_v26_data') || localStorage.getItem('sushi_log_v25_data');
     if (saved) {
         const data = JSON.parse(saved);
         presets = data.presets || presets;
@@ -40,7 +50,7 @@ function loadData() {
 
 function saveData() {
     const data = { presets, totalHistory };
-    localStorage.setItem('sushi_log_v23_data', JSON.stringify(data));
+    localStorage.setItem('sushi_log_v26_data', JSON.stringify(data));
 }
 
 async function requestWakeLock() {
@@ -56,10 +66,11 @@ function renderPresetChips() {
     presets.forEach((p, i) => {
         const btn = document.createElement('div');
         btn.className = 'preset-chip';
-        btn.style.borderLeft = `5px solid ${p.color}`;
-        btn.innerHTML = `<strong>${p.name}</strong><br><small>${p.prices.join('円, ')}円</small>`;
+        btn.style.borderLeft = `5px solid ${escapeHTML(p.color)}`;
+        btn.innerHTML = `<strong>${escapeHTML(p.name)}</strong><br><small>${p.prices.join('円, ')}円</small>`;
         btn.onclick = () => {
             currentPresetIndex = i;
+            triggerVibrate(30);
             startSession();
         };
         container.appendChild(btn);
@@ -68,9 +79,9 @@ function renderPresetChips() {
 
 function startSession() {
     const p = presets[currentPresetIndex];
-    document.getElementById('current-shop-name').innerText = p.name;
-    document.getElementById('app-bar').style.borderBottom = `4px solid ${p.color}`;
-    document.documentElement.style.setProperty('--primary', p.color);
+    document.getElementById('current-shop-name').innerText = escapeHTML(p.name);
+    document.getElementById('app-bar').style.borderBottom = `4px solid ${escapeHTML(p.color)}`;
+    document.documentElement.style.setProperty('--primary', escapeHTML(p.color));
     
     currentSessionPrices = [...p.prices];
     updatePriceSelectAndChips();
@@ -78,12 +89,16 @@ function startSession() {
     plateCounts = {};
     actionHistory = []; 
     currentTotalAmount = 0;
+    
+    document.getElementById('discount-val').value = '';
+    document.getElementById('split-count').value = '1';
+
     document.getElementById('output-area').innerHTML = ''; 
     document.getElementById('title-screen').classList.add('hidden');
     document.getElementById('main-screen').classList.remove('hidden');
     
     requestWakeLock();
-    addLog(`${p.name} でのセッションを開始しました。`);
+    addLog(`${escapeHTML(p.name)} でのセッションを開始しました。`);
     updateAll();
 }
 
@@ -106,6 +121,7 @@ function renderQuickAddButtons(prices) {
         btn.className = 'chip';
         btn.innerText = `+${price}円`;
         btn.onclick = () => {
+            triggerVibrate(40); 
             platesAddedInLastAction = 1; 
             actionHistory.push({ price: price, count: 1 });
             plateCounts[price] = (plateCounts[price] || 0) + 1;
@@ -124,10 +140,11 @@ document.getElementById('add-custom-price-btn').onclick = () => {
         currentSessionPrices.push(newPrice);
         currentSessionPrices.sort((a, b) => a - b);
         updatePriceSelectAndChips();
-        addLog(`【新規】${newPrice}円のお皿をメニューに追加しました。`);
+        addLog(`【新規】${escapeHTML(newPrice)}円のお皿を追加しました。`);
     }
     priceSelect.value = newPrice;
     inputField.value = '';
+    triggerVibrate(30);
 };
 
 document.getElementById('open-settings').onclick = () => {
@@ -137,9 +154,9 @@ document.getElementById('open-settings').onclick = () => {
         const div = document.createElement('div');
         div.className = 'settings-item card';
         div.innerHTML = `
-            <input type="text" value="${p.name}" onchange="presets[${i}].name=this.value">
+            <input type="text" value="${escapeHTML(p.name)}" onchange="presets[${i}].name=this.value">
             <div style="display:flex; gap:8px; margin-top:8px;">
-                <input type="color" value="${p.color}" onchange="presets[${i}].color=this.value">
+                <input type="color" value="${escapeHTML(p.color)}" onchange="presets[${i}].color=this.value">
                 <input type="text" value="${p.prices.join(',')}" onchange="presets[${i}].prices=this.value.split(',').map(Number)">
                 <button class="btn-danger-small" onclick="presets.splice(${i},1); document.getElementById('open-settings').click();">削除</button>
             </div>
@@ -171,6 +188,7 @@ function undoLastAction() {
         if (plateCounts[last.price] <= 0) delete plateCounts[last.price];
         platesAddedInLastAction = 0; 
         addLog(`【取消】${last.price}円のお皿の操作を元に戻しました。`);
+        triggerVibrate(30);
         updateAll();
     }
 }
@@ -204,6 +222,7 @@ function updateAll() {
     updateTexts(total);
     updateStatsArea(total);
     updateHistoryArea();
+    updateCheckoutArea(total);
 }
 
 function updateTower() {
@@ -227,26 +246,31 @@ function updateTower() {
         }
     }
     
-    domPlates.forEach((p, index) => {
-        towerContainer.appendChild(p);
-        if ((index + 1) % 10 === 0) {
+    // ★変更：要素が少ない時に「下」に押し付けるためのスペーサーを一番上に追加
+    const spacer = document.createElement('div');
+    spacer.style.marginTop = 'auto';
+    towerContainer.appendChild(spacer);
+
+    // ★変更：新しいお皿（配列の後ろ）から順に上から積んでいく
+    for (let i = domPlates.length - 1; i >= 0; i--) {
+        domPlates[i].style.zIndex = i + 1; // 上の皿ほど前面に出るようにする
+        towerContainer.appendChild(domPlates[i]);
+        
+        // 10枚ごとにマーカーを挿入（下から数えた枚数）
+        if ((i + 1) % 10 === 0) {
             const marker = document.createElement('div');
             marker.className = 'tower-marker';
-            marker.innerHTML = `<span>${index + 1}</span>`;
+            marker.innerHTML = `<span>${i + 1}</span>`;
             towerContainer.appendChild(marker);
         }
-    });
+    }
 
-    // ★変更：最後に追加されたDOM要素へスクロールさせることで確実に一番上へフォーカス
+    // ★変更：タワーのコンテナ「内」だけを確実にscrollTop=0（一番上）にスクロール
     if (platesAddedInLastAction > 0) {
         setTimeout(() => {
-            const lastAddedElement = towerContainer.lastElementChild;
-            if (lastAddedElement) {
-                lastAddedElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
+            towerContainer.scrollTo({ top: 0, behavior: 'smooth' });
         }, 50);
     }
-    
     platesAddedInLastAction = 0; 
 }
 
@@ -314,10 +338,38 @@ function updateHistoryArea() {
     historyArea.innerHTML = totalHistory.map((t, i) => `<div>セッション ${i + 1}: <strong>${t.toLocaleString()} 円</strong></div>`).join('');
 }
 
-document.getElementById('count-plus').onclick = () => plateCountInput.value++;
-document.getElementById('count-minus').onclick = () => { if (plateCountInput.value > -99) plateCountInput.value--; };
+function updateCheckoutArea(total) {
+    const discountVal = parseFloat(document.getElementById('discount-val').value) || 0;
+    const discountType = document.getElementById('discount-type').value;
+    let splitCount = parseInt(document.getElementById('split-count').value) || 1;
+    
+    if (splitCount < 1) splitCount = 1;
+
+    let discountedTotal = total;
+    if (discountType === 'yen') {
+        discountedTotal -= discountVal;
+    } else if (discountType === 'percent') {
+        discountedTotal -= total * (discountVal / 100);
+    }
+    
+    if (discountedTotal < 0) discountedTotal = 0;
+    
+    const perPerson = Math.ceil(discountedTotal / splitCount);
+
+    document.getElementById('discounted-total').innerText = Math.floor(discountedTotal).toLocaleString();
+    document.getElementById('per-person-amount').innerText = perPerson.toLocaleString();
+}
+
+document.getElementById('discount-val').addEventListener('input', () => updateAll());
+document.getElementById('discount-type').addEventListener('change', () => updateAll());
+document.getElementById('split-count').addEventListener('input', () => updateAll());
+
+
+document.getElementById('count-plus').onclick = () => { plateCountInput.value++; triggerVibrate(20); };
+document.getElementById('count-minus').onclick = () => { if (plateCountInput.value > -99) plateCountInput.value--; triggerVibrate(20); };
 
 document.getElementById('add-plate-button').onclick = () => {
+    triggerVibrate(50); 
     const p = priceSelect.value;
     const c = parseInt(plateCountInput.value);
     

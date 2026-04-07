@@ -7,8 +7,8 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     
-    <title>Sushi Log v0.23</title>
-    <link rel="stylesheet" href="style.css?v=23">
+    <title>Sushi Log v0.26</title>
+    <link rel="stylesheet" href="style.css?v=26">
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -60,7 +60,7 @@
 
             <section class="card input-section">
                 <div class="custom-price-area">
-                    <input type="number" id="custom-price-input" placeholder="新しい金額を追加 (円)">
+                    <input type="number" id="custom-price-input" placeholder="新しい金額を追加 (円)" class="styled-input">
                     <button id="add-custom-price-btn" class="btn-outline">種類を追加</button>
                 </div>
 
@@ -98,6 +98,33 @@
                     </div>
                 </details>
             </section>
+
+            <section class="card checkout-card">
+                <h3>💰 お会計計算</h3>
+                <div class="checkout-grid">
+                    <div class="input-group">
+                        <label>割引</label>
+                        <div style="display:flex; gap:5px;">
+                            <input type="number" id="discount-val" placeholder="0" class="styled-input" style="width: 60%;" min="0">
+                            <select id="discount-type" class="styled-select" style="width: 40%; padding: 5px;">
+                                <option value="yen">円引</option>
+                                <option value="percent">％引</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>割り勘</label>
+                        <div style="display:flex; align-items:center; gap:5px;">
+                            <input type="number" id="split-count" value="1" min="1" class="styled-input" style="width: 80%;">
+                            <span>人</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="checkout-result">
+                    <div>割引後合計: <strong id="discounted-total">0</strong> 円</div>
+                    <div class="split-result">1人あたり: <strong id="per-person-amount" class="highlight-text">0</strong> 円</div>
+                </div>
+            </section>
         </main>
     </div>
 
@@ -120,7 +147,9 @@
                 <p>金額ボタン（+〇〇円）を直接タップすると素早く追加できます。</p>
                 <h4>3. メニューにない金額の追加</h4>
                 <p>入力欄に金額を打ち込んで「種類を追加」を押してください。</p>
-                <h4>4. 管理メニュー（︙）</h4>
+                <h4>4. お会計計算</h4>
+                <p>一番下のエリアで、クーポンの割引や割り勘の計算ができます。</p>
+                <h4>5. 管理メニュー（︙）</h4>
                 <p>右上の「︙」から、予算設定、保存、CSV出力、リセットが行えます。</p>
             </div>
             <button id="close-help" class="btn-primary btn-block" style="margin-top:20px;">閉じる</button>
@@ -138,6 +167,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=23"></script>
+    <script src="script.js?v=26"></script>
 </body>
 </html>
