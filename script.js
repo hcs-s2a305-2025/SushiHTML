@@ -50,11 +50,11 @@ function triggerVibrate(ms) {
     if (navigator.vibrate) navigator.vibrate(ms);
 }
 
-// データの読み込み (v28から順に古いデータを探す)
+// データの読み込み (v29から順に古いデータを探す)
 function loadData() {
-    let saved = localStorage.getItem('sushi_log_v28_data') || 
-                localStorage.getItem('sushi_log_v27_data') || 
-                localStorage.getItem('sushi_log_v26_data');
+    let saved = localStorage.getItem('sushi_log_v29_data') || 
+                localStorage.getItem('sushi_log_v28_data') || 
+                localStorage.getItem('sushi_log_v27_data');
     if (saved) {
         const data = JSON.parse(saved);
         presets = data.presets || presets;
@@ -65,7 +65,7 @@ function loadData() {
 // データの保存
 function saveData() {
     const data = { presets, totalHistory };
-    localStorage.setItem('sushi_log_v28_data', JSON.stringify(data));
+    localStorage.setItem('sushi_log_v29_data', JSON.stringify(data));
 }
 
 // 画面の自動消灯をブロックするリクエスト
@@ -392,7 +392,11 @@ document.getElementById('add-plate-button').onclick = () => {
     plateCountInput.value = 1;
 };
 
-// 各種モーダルの開閉処理
+// ==========================================
+// 6. モーダルとヘッダーの制御
+// ==========================================
+
+// ★設定モーダル
 document.getElementById('open-settings').onclick = () => {
     const list = document.getElementById('settings-list');
     list.innerHTML = '';
@@ -421,12 +425,21 @@ document.getElementById('close-settings').onclick = () => {
     document.getElementById('settings-modal').classList.add('hidden');
 };
 
-document.getElementById('help-button').onclick = () => document.getElementById('help-modal').classList.remove('hidden');
+// ★ヘルプ・About・管理メニュー等の共通開閉処理
+const openHelp = () => document.getElementById('help-modal').classList.remove('hidden');
+document.getElementById('help-button').onclick = openHelp;
+document.getElementById('title-help-button').onclick = openHelp;
 document.getElementById('close-help').onclick = () => document.getElementById('help-modal').classList.add('hidden');
+
+// タイトル画面のAbout(このアプリについて)
+document.getElementById('title-about-button').onclick = () => document.getElementById('about-modal').classList.remove('hidden');
+document.getElementById('close-about').onclick = () => document.getElementById('about-modal').classList.add('hidden');
+
+// 管理メニュー
 document.getElementById('action-menu-button').onclick = () => document.getElementById('action-menu-modal').classList.remove('hidden');
 document.getElementById('close-action-menu').onclick = () => document.getElementById('action-menu-modal').classList.add('hidden');
 
-// ヘッダーのアクションボタン群
+// タイトルに戻る
 document.getElementById('back-to-title').onclick = () => {
     document.getElementById('main-screen').classList.add('hidden');
     document.getElementById('title-screen').classList.remove('hidden');
@@ -434,13 +447,18 @@ document.getElementById('back-to-title').onclick = () => {
     if (wakeLock !== null) wakeLock.release().then(() => { wakeLock = null; });
 };
 
-document.getElementById('theme-toggle').onclick = () => {
+// ★テーマ切替の共通処理
+const toggleTheme = () => {
     const isDark = document.body.hasAttribute('data-theme');
     if (isDark) document.body.removeAttribute('data-theme');
     else document.body.setAttribute('data-theme', 'dark');
     localStorage.setItem('theme', isDark ? 'light' : 'dark');
 };
+document.getElementById('theme-toggle').onclick = toggleTheme;
+document.getElementById('title-theme-toggle').onclick = toggleTheme;
 
+
+// メニュー内の個別機能（保存・リセット・CSV等）
 document.getElementById('save-button').onclick = () => {
     const total = Object.entries(plateCounts).reduce((acc, [p, c]) => acc + (p * c), 0);
     if (total > 0) {

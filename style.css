@@ -31,12 +31,12 @@ body {
     margin: 0; 
     overflow-x: hidden; 
     
-    /* ★追加：連打中の意図しないテキスト選択を防止 */
+    /* 連打中の意図しないテキスト選択を防止 */
     user-select: none; 
     -webkit-user-select: none;
 }
 
-/* ★追加：入力欄だけはテキスト選択を許可する */
+/* 入力欄だけはテキスト選択を許可する */
 input, textarea, select {
     user-select: auto;
     -webkit-user-select: auto;
@@ -52,6 +52,12 @@ input, textarea, select {
 /* =========================================
    3. UIパーツ（タイトル・ヘッダー・ボタン）
 ========================================= */
+/* ★追加：タイトル画面のアクションボタン群配置 */
+.title-actions { position: absolute; top: 16px; right: 16px; display: flex; gap: 8px; }
+
+/* ★追加：アイコンボタンのベーススタイル定義 */
+.btn-icon { background: transparent; border: none; font-size: 1.5rem; cursor: pointer; padding: 4px; color: var(--text); }
+
 .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 90%; max-width: 400px; margin: 25px 0; }
 .preset-chip { background: var(--card-bg); padding: 20px 15px; border-radius: 12px; border: 1px solid var(--border); cursor: pointer; text-align: left; }
 
@@ -61,9 +67,9 @@ input, textarea, select {
 .summary-card { text-align: center; background: var(--primary); color: white; border: none; transition: background 0.3s ease; }
 .price-main { font-size: 3rem; font-weight: bold; }
 
-/* ★追加：タップ可能な要素へのダブルタップズーム防止処理 */
+/* タップ可能な要素へのダブルタップズーム防止処理 */
 button, .chip, .preset-chip, .btn-icon, select, input {
-    touch-action: manipulation; /* これがズームを完全にブロックする魔法のCSSです */
+    touch-action: manipulation; 
 }
 
 button { transition: transform 0.1s ease, background-color 0.2s; font-family: inherit; }
