@@ -50,22 +50,22 @@ function triggerVibrate(ms) {
     if (navigator.vibrate) navigator.vibrate(ms);
 }
 
-// データの読み込み (v29から順に古いデータを探す)
 function loadData() {
-    let saved = localStorage.getItem('sushi_log_v29_data') || 
-                localStorage.getItem('sushi_log_v28_data') || 
-                localStorage.getItem('sushi_log_v27_data');
+    // 古いデータ（v29など）を引き継がず、新しいキー(v32)だけを見るようにする
+    let saved = localStorage.getItem('sushi_log_v32_data'); 
+    
     if (saved) {
         const data = JSON.parse(saved);
         presets = data.presets || presets;
         totalHistory = data.totalHistory || [];
     }
+    // savedがない（初回アクセス）場合は、コード上の新しいpresetsがそのまま使われます
 }
 
-// データの保存
 function saveData() {
     const data = { presets, totalHistory };
-    localStorage.setItem('sushi_log_v29_data', JSON.stringify(data));
+    // 保存時も新しいキーを使う
+    localStorage.setItem('sushi_log_v32_data', JSON.stringify(data));
 }
 
 // 画面の自動消灯をブロックするリクエスト
