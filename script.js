@@ -13,9 +13,9 @@ let platesAddedInLastAction = 0;  // 落下アニメーション制御用
 
 // 店舗の初期プリセットデータ
 let presets = [
-    { name: "スシロー", color: "#d32f2f", prices: [120, 180, 260, 360] },
-    { name: "くら寿司", color: "#2e7d32", prices: [115, 165, 250] },
-    { name: "はま寿司", color: "#0277bd", prices: [110, 165, 319] }
+    { name: "スシロー", color: "#d32f2f", prices: [120, 140, 180, 200, 260, 360] },
+    { name: "くら寿司", color: "#2e7d32", prices: [110, 120, 130, 150, 170, 190, 210, 240, 270, 280, 390] },
+    { name: "はま寿司", color: "#0277bd", prices: [110, 132, 176, 231, 319] }
 ];
 let currentPresetIndex = 0;       // 現在選択されている店舗のインデックス
 let currentSessionPrices = [];    // 現在のセッションで有効な価格リスト（カスタム追加用）
