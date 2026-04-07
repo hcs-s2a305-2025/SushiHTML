@@ -5,14 +5,13 @@ let budget = Infinity;
 let myChart = null;
 let wakeLock = null; 
 
-// 店舗プリセット初期データ
 let presets = [
     { name: "スシロー", color: "#d32f2f", prices: [120, 180, 260, 360] },
     { name: "くら寿司", color: "#2e7d32", prices: [115, 165, 250] },
     { name: "はま寿司", color: "#0277bd", prices: [110, 165, 319] }
 ];
 let currentPresetIndex = 0;
-let currentSessionPrices = []; // ★現在のセッションで有効な金額リスト
+let currentSessionPrices = []; 
 
 const priceSelect = document.getElementById('price-select');
 const plateCountInput = document.getElementById('plate-count');
@@ -26,7 +25,12 @@ window.onload = () => {
 };
 
 function loadData() {
-    const saved = localStorage.getItem('sushi_log_v20_data');
+    // ★変更：v21のデータを探し、なければv20のデータを引き継ぐ
+    let saved = localStorage.getItem('sushi_log_v21_data');
+    if (!saved) {
+        saved = localStorage.getItem('sushi_log_v20_data'); 
+    }
+    
     if (saved) {
         const data = JSON.parse(saved);
         presets = data.presets || presets;
@@ -36,7 +40,8 @@ function loadData() {
 
 function saveData() {
     const data = { presets, totalHistory };
-    localStorage.setItem('sushi_log_v20_data', JSON.stringify(data));
+    // ★変更：新しいキーで保存
+    localStorage.setItem('sushi_log_v21_data', JSON.stringify(data));
 }
 
 async function requestWakeLock() {
@@ -71,7 +76,6 @@ function startSession() {
     document.getElementById('app-bar').style.borderBottom = `4px solid ${p.color}`;
     document.documentElement.style.setProperty('--primary', p.color);
     
-    // セッション用の価格リストを初期化
     currentSessionPrices = [...p.prices];
     updatePriceSelectAndChips();
 
@@ -86,7 +90,6 @@ function startSession() {
     updateAll();
 }
 
-// ★追加：セレクトボックスとチップを更新する共通関数
 function updatePriceSelectAndChips() {
     priceSelect.innerHTML = '';
     currentSessionPrices.forEach(price => {
@@ -115,7 +118,6 @@ function renderQuickAddButtons(prices) {
     });
 }
 
-// ★追加：カスタム金額の追加処理
 document.getElementById('add-custom-price-btn').onclick = () => {
     const inputField = document.getElementById('custom-price-input');
     const newPrice = parseInt(inputField.value);
@@ -127,13 +129,13 @@ document.getElementById('add-custom-price-btn').onclick = () => {
     
     if (!currentSessionPrices.includes(newPrice)) {
         currentSessionPrices.push(newPrice);
-        currentSessionPrices.sort((a, b) => a - b); // 金額順に並び替え
+        currentSessionPrices.sort((a, b) => a - b);
         updatePriceSelectAndChips();
         addLog(`【新規】${newPrice}円のお皿をメニューに追加しました。`);
     }
     
-    priceSelect.value = newPrice; // セレクトボックスを追加した金額に合わせる
-    inputField.value = ''; // 入力欄をクリア
+    priceSelect.value = newPrice;
+    inputField.value = '';
 };
 
 document.getElementById('open-settings').onclick = () => {
@@ -166,6 +168,14 @@ document.getElementById('close-settings').onclick = () => {
     document.getElementById('settings-modal').classList.add('hidden');
 };
 
+// ★追加：使い方モーダルの開閉処理
+document.getElementById('help-button').onclick = () => {
+    document.getElementById('help-modal').classList.remove('hidden');
+};
+document.getElementById('close-help').onclick = () => {
+    document.getElementById('help-modal').classList.add('hidden');
+};
+
 function undoLastAction() {
     if (actionHistory.length === 0) return;
     const last = actionHistory.pop();
@@ -196,7 +206,7 @@ function updateAll() {
 function updateTower() {
     towerContainer.innerHTML = '';
     const color = presets[currentPresetIndex].color;
-    let totalStacked = 0; // ★追加：積み上げた枚数のカウンター
+    let totalStacked = 0;
 
     Object.entries(plateCounts).forEach(([price, count]) => {
         for (let i = 0; i < count; i++) {
@@ -207,7 +217,6 @@ function updateTower() {
             p.style.opacity = Math.min(1.0, 0.5 + (price / 1000));
             towerContainer.appendChild(p);
 
-            // ★追加：10枚ごとに目盛りを挿入
             if (totalStacked % 10 === 0) {
                 const marker = document.createElement('div');
                 marker.className = 'tower-marker';
@@ -223,7 +232,7 @@ function initChart() {
     myChart = new Chart(ctx, {
         type: 'doughnut',
         data: { labels: [], datasets: [{ data: [], backgroundColor: ['#ff5252', '#448aff', '#4caf50', '#ffeb3b', '#9c27b0'] }] },
-        options: { plugins: { legend: { display: false } }, cutout: '75%' } // cutoutを少し広げて文字を見やすく
+        options: { plugins: { legend: { display: false } }, cutout: '75%' }
     });
 }
 
@@ -232,7 +241,6 @@ function updateChart() {
     myChart.data.datasets[0].data = Object.values(plateCounts);
     myChart.update();
 
-    // ★追加：総枚数を計算して中央テキストに反映
     const totalPlates = Object.values(plateCounts).reduce((acc, c) => acc + c, 0);
     document.getElementById('chart-center-text').innerText = `${totalPlates}枚`;
 }

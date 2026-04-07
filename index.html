@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sushi Log v0.20</title>
-    <link rel="stylesheet" href="style.css">
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <title>Sushi Log v0.21</title>
+    <link rel="stylesheet" href="style.css?v=21">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -22,7 +26,10 @@
         <header id="app-bar" class="app-bar">
             <button id="back-to-title" class="btn-icon">←</button>
             <h2 id="current-shop-name">Sushi Log</h2>
-            <button id="theme-toggle" class="btn-icon">🌓</button>
+            <div class="header-actions">
+                <button id="help-button" class="btn-icon">❓</button>
+                <button id="theme-toggle" class="btn-icon">🌓</button>
+            </div>
         </header>
 
         <main class="container">
@@ -104,6 +111,28 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <div id="help-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>🍣 使い方ガイド</h3>
+            <div class="help-scroll-area">
+                <h4>1. お店を選ぶ</h4>
+                <p>最初の画面で、行くお店を選んでスタートします。「⚙️ プリセットを編集」から、自分だけのお店の名前や金額を追加することも可能です。</p>
+                
+                <h4>2. お皿を記録する</h4>
+                <p>食べたお皿の金額と枚数を選んで「お皿を確定」ボタンを押します。<br>金額ボタン（+〇〇円）を直接タップすると、1枚ずつ素早く追加できます。</p>
+                
+                <h4>3. メニューにない金額の追加</h4>
+                <p>特別メニューなどで一覧にない金額のお皿があった場合は、入力欄に金額を打ち込んで「種類を追加」を押してください。そのセッション中だけ使えるボタンが追加されます。</p>
+                
+                <h4>4. 便利な機能</h4>
+                <p>・<strong>予算設定:</strong> 食べすぎ防止に予算をセットできます。近づくと警告が出ます。<br>
+                ・<strong>1つ取り消す:</strong> 間違えて追加してしまった場合、「詳細データ」の中にある「↩️ 1つ取り消す」ボタンで元に戻せます。<br>
+                ・<strong>保存・リセット:</strong> 食べ終わったら保存して履歴に残すか、リセットして最初からやり直すことができます。</p>
+            </div>
+            <button id="close-help" class="btn-primary btn-block" style="margin-top:20px;">閉じる</button>
+        </div>
+    </div>
+
+    <script src="script.js?v=21"></script>
 </body>
 </html>
