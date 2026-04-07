@@ -7,8 +7,8 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     
-    <title>Sushi Log v0.22</title>
-    <link rel="stylesheet" href="style.css?v=22">
+    <title>Sushi Log v0.23</title>
+    <link rel="stylesheet" href="style.css?v=23">
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -65,9 +65,9 @@
                 </div>
 
                 <div class="input-row">
-                    <div class="input-group">
+                    <div class="input-group" style="flex: 1;">
                         <label>単価選択</label>
-                        <select id="price-select"></select>
+                        <select id="price-select" class="styled-select"></select>
                     </div>
                     <div class="input-group">
                         <label>枚数</label>
@@ -82,16 +82,20 @@
                 <button id="add-plate-button" class="btn-primary btn-block">お皿を確定</button>
             </section>
 
-            <section class="details">
-                <details>
+            <section class="details-section">
+                <details class="card details-card">
                     <summary>詳細データ</summary>
-                    <div id="summary-area" class="info-box"></div>
-                    <div id="stats-area" class="info-box"></div>
+                    <div class="details-content">
+                        <div id="summary-area" class="info-box"></div>
+                        <div id="stats-area" class="info-box"></div>
+                    </div>
                 </details>
-                <details>
+                <details class="card details-card">
                     <summary>履歴・ログ</summary>
-                    <div id="history-area" class="info-box"></div>
-                    <div id="output-area" class="info-box"></div>
+                    <div class="details-content">
+                        <div id="history-area" class="info-box"></div>
+                        <div id="output-area" class="info-box"></div>
+                    </div>
                 </details>
             </section>
         </main>
@@ -111,7 +115,7 @@
             <h3>🍣 使い方ガイド</h3>
             <div class="help-scroll-area">
                 <h4>1. お店を選ぶ</h4>
-                <p>最初の画面で、行くお店を選んでスタートします。「⚙️ プリセットを編集」から、自分だけのお店の名前や金額を追加することも可能です。</p>
+                <p>最初の画面で、行くお店を選んでスタートします。「⚙️ プリセットを編集」からお店の名前や金額を追加可能です。</p>
                 <h4>2. お皿を記録する</h4>
                 <p>金額ボタン（+〇〇円）を直接タップすると素早く追加できます。</p>
                 <h4>3. メニューにない金額の追加</h4>
@@ -134,6 +138,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=22"></script>
+    <script src="script.js?v=23"></script>
 </body>
 </html>

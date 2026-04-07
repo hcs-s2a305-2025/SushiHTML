@@ -18,7 +18,6 @@
     --guide-bg: #332d00;
 }
 
-/* ★変更：Zen Maru Gothic フォントを適用 */
 body { font-family: 'Zen Maru Gothic', -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; overflow-x: hidden; }
 .screen { transition: 0.3s; }
 .hidden { display: none !important; }
@@ -27,7 +26,10 @@ body { font-family: 'Zen Maru Gothic', -apple-system, sans-serif; background: va
 .container { padding: 16px; max-width: 500px; margin: 0 auto; }
 .card { background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
 
-/* ヘッダー */
+/* ★変更：お店選択のギャップとパディングを広げて押しやすく */
+.preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 90%; max-width: 400px; margin: 25px 0; }
+.preset-chip { background: var(--card-bg); padding: 20px 15px; border-radius: 12px; border: 1px solid var(--border); cursor: pointer; text-align: left; }
+
 .app-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; background: var(--card-bg); position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 .header-actions { display: flex; gap: 8px; }
 
@@ -37,22 +39,15 @@ body { font-family: 'Zen Maru Gothic', -apple-system, sans-serif; background: va
 .visual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .v-card { height: 210px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
-/* ★変更：お皿タワー（リアル化・重なり・アニメーション） */
 #sushi-tower { display: flex; flex-direction: column-reverse; width: 80px; height: 140px; overflow-y: auto; overflow-x: hidden; border-bottom: 3px solid var(--border); padding-right: 15px; padding-bottom: 5px; scroll-behavior: smooth; }
 .plate-visual { 
-    width: 50px; 
-    height: 12px; 
-    border-radius: 50% / 50%; /* 楕円形に */
-    margin-bottom: -5px;      /* お皿同士を重ねる */
+    width: 50px; height: 12px; border-radius: 50% / 50%; margin-bottom: -5px;      
     box-shadow: 0 2px 3px rgba(0,0,0,0.2), inset 0 -2px 3px rgba(0,0,0,0.1); 
-    border: 1px solid rgba(255,255,255,0.4);
-    flex-shrink: 0; 
-    position: relative;
+    border: 1px solid rgba(255,255,255,0.4); flex-shrink: 0; position: relative;
 }
 .tower-marker { width: 40px; height: 0; border-bottom: 2px dashed var(--text-sub); margin-bottom: 5px; position: relative; flex-shrink: 0; z-index: 10; }
 .tower-marker span { position: absolute; right: -30px; top: -10px; font-size: 0.75rem; color: var(--text-sub); font-weight: bold; }
 
-/* 落下アニメーション */
 @keyframes dropIn {
     0% { transform: translateY(-40px) scale(1.1); opacity: 0; }
     100% { transform: translateY(0) scale(1); opacity: 1; }
@@ -62,13 +57,22 @@ body { font-family: 'Zen Maru Gothic', -apple-system, sans-serif; background: va
 .chart-wrapper { height: 120px; width: 120px; position: relative; display: flex; align-items: center; justify-content: center; }
 .chart-center { position: absolute; font-weight: bold; font-size: 1.2rem; pointer-events: none; color: var(--text); }
 
+/* 入力エリア */
+.input-row { display: flex; gap: 10px; align-items: center; }
+.input-group label { display: block; font-size: 0.85rem; color: var(--text-sub); margin-bottom: 4px; }
+
+/* ★変更：入力欄とセレクトボックスのデザインを完全に統一 */
 .custom-price-area { display: flex; gap: 8px; margin-bottom: 15px; }
-.custom-price-area input { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-family: inherit; }
+.custom-price-area input, .styled-select { 
+    flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); 
+    background: var(--bg); color: var(--text); font-family: inherit; font-size: 1rem; width: 100%;
+}
+/* セレクトボックス特有の調整 */
+.styled-select { height: 43px; cursor: pointer; } 
 
 .stepper-large { display: flex; align-items: center; gap: 10px; }
 .stepper-large input { width: 50px; text-align: center; font-size: 1.2rem; border: none; background: transparent; color: var(--text); font-family: inherit; font-weight: bold; }
 
-/* ★変更：ボタンのフィードバック（へこむ動き） */
 button { transition: transform 0.1s ease, background-color 0.2s; font-family: inherit; }
 button:active { transform: scale(0.95); }
 
@@ -78,10 +82,16 @@ button:active { transform: scale(0.95); }
 .btn-danger { color: var(--danger); border: 1px solid var(--danger); background: transparent; padding: 10px; border-radius: 10px; font-weight: bold; }
 .btn-text { background: none; border: none; color: var(--text-sub); margin-top: 20px; text-decoration: underline; cursor: pointer; }
 
-/* チップのフィードバック */
 .chip-group { display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; }
 .chip { padding: 10px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text); font-size: 0.9rem; font-weight: bold; cursor: pointer; }
 .chip:active { background-color: var(--primary); color: white; transform: scale(0.9) translateY(2px); }
+
+/* ★変更：詳細データ・履歴ログのアコーディオンデザイン */
+.details-section { margin-top: 10px; }
+.details-card { padding: 16px; margin-bottom: 12px; }
+.details-card summary { font-weight: bold; cursor: pointer; outline: none; margin-bottom: 10px; list-style-position: inside; }
+.details-content { margin-top: 10px; }
+.info-box { background: var(--bg); padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border); font-size: 0.9rem; }
 
 /* モーダル */
 .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(3px); }

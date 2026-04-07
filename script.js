@@ -5,8 +5,8 @@ let budget = Infinity;
 let myChart = null;
 let wakeLock = null; 
 
-let currentTotalAmount = 0; // ★追加：カウントアップ用
-let platesAddedInLastAction = 0; // ★追加：落下アニメ用
+let currentTotalAmount = 0; 
+let platesAddedInLastAction = 0; 
 
 let presets = [
     { name: "スシロー", color: "#d32f2f", prices: [120, 180, 260, 360] },
@@ -28,8 +28,8 @@ window.onload = () => {
 };
 
 function loadData() {
-    let saved = localStorage.getItem('sushi_log_v22_data');
-    if (!saved) saved = localStorage.getItem('sushi_log_v21_data'); 
+    let saved = localStorage.getItem('sushi_log_v23_data');
+    if (!saved) saved = localStorage.getItem('sushi_log_v22_data'); 
     
     if (saved) {
         const data = JSON.parse(saved);
@@ -40,7 +40,7 @@ function loadData() {
 
 function saveData() {
     const data = { presets, totalHistory };
-    localStorage.setItem('sushi_log_v22_data', JSON.stringify(data));
+    localStorage.setItem('sushi_log_v23_data', JSON.stringify(data));
 }
 
 async function requestWakeLock() {
@@ -106,7 +106,7 @@ function renderQuickAddButtons(prices) {
         btn.className = 'chip';
         btn.innerText = `+${price}円`;
         btn.onclick = () => {
-            platesAddedInLastAction = 1; // 1枚追加としてマーク
+            platesAddedInLastAction = 1; 
             actionHistory.push({ price: price, count: 1 });
             plateCounts[price] = (plateCounts[price] || 0) + 1;
             addLog(`${price}円のお皿を 1 枚追加しました。`);
@@ -130,8 +130,7 @@ document.getElementById('add-custom-price-btn').onclick = () => {
     inputField.value = '';
 };
 
-// モーダル開閉
-document.getElementById('open-settings').onclick = () => { /* 略せず既存通り */
+document.getElementById('open-settings').onclick = () => {
     const list = document.getElementById('settings-list');
     list.innerHTML = '';
     presets.forEach((p, i) => {
@@ -161,8 +160,6 @@ document.getElementById('close-settings').onclick = () => {
 
 document.getElementById('help-button').onclick = () => document.getElementById('help-modal').classList.remove('hidden');
 document.getElementById('close-help').onclick = () => document.getElementById('help-modal').classList.add('hidden');
-
-// ★追加：アクションメニュー開閉
 document.getElementById('action-menu-button').onclick = () => document.getElementById('action-menu-modal').classList.remove('hidden');
 document.getElementById('close-action-menu').onclick = () => document.getElementById('action-menu-modal').classList.add('hidden');
 
@@ -172,7 +169,7 @@ function undoLastAction() {
     if (plateCounts[last.price]) {
         plateCounts[last.price] -= last.count;
         if (plateCounts[last.price] <= 0) delete plateCounts[last.price];
-        platesAddedInLastAction = 0; // 取消時はアニメさせない
+        platesAddedInLastAction = 0; 
         addLog(`【取消】${last.price}円のお皿の操作を元に戻しました。`);
         updateAll();
     }
@@ -184,13 +181,11 @@ function addLog(message) {
     outputArea.innerHTML = `<div style="font-size: 0.9em; margin-bottom: 4px; border-bottom: 1px dashed var(--border); padding-bottom: 2px;">[${time}] ${message}</div>` + outputArea.innerHTML;
 }
 
-// ★追加：数字のカウントアップアニメーション
 function animateValue(obj, start, end, duration) {
     let startTimestamp = null;
     const step = (timestamp) => {
         if (!startTimestamp) startTimestamp = timestamp;
         const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-        // イージング（滑らかな減速）
         const easeOutQuart = 1 - Math.pow(1 - progress, 4);
         obj.innerHTML = Math.floor(start + easeOutQuart * (end - start)).toLocaleString();
         if (progress < 1) window.requestAnimationFrame(step);
@@ -200,8 +195,6 @@ function animateValue(obj, start, end, duration) {
 
 function updateAll() {
     const total = Object.entries(plateCounts).reduce((acc, [p, c]) => acc + (p * c), 0);
-    
-    // ★変更：合計金額をカウントアップで表示
     const totalDisplay = document.getElementById('total-display');
     animateValue(totalDisplay, currentTotalAmount, total, 600);
     currentTotalAmount = total;
@@ -228,14 +221,12 @@ function updateTower() {
         }
     });
 
-    // ★追加：最後に追加された枚数分だけ、落下アニメーション用のクラスを付与
     if (platesAddedInLastAction > 0 && domPlates.length >= platesAddedInLastAction) {
         for (let i = domPlates.length - platesAddedInLastAction; i < domPlates.length; i++) {
             domPlates[i].classList.add('drop-in');
         }
     }
     
-    // 配置
     domPlates.forEach((p, index) => {
         towerContainer.appendChild(p);
         if ((index + 1) % 10 === 0) {
@@ -246,15 +237,17 @@ function updateTower() {
         }
     });
 
-    // ★追加：一番上（追加された最新の皿）へ自動スクロール
+    // ★変更：最後に追加されたDOM要素へスクロールさせることで確実に一番上へフォーカス
     if (platesAddedInLastAction > 0) {
         setTimeout(() => {
-            // column-reverseでは scrollTop 0 が一番上
-            towerContainer.scrollTo({ top: 0, behavior: 'smooth' });
+            const lastAddedElement = towerContainer.lastElementChild;
+            if (lastAddedElement) {
+                lastAddedElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }, 50);
     }
     
-    platesAddedInLastAction = 0; // リセット
+    platesAddedInLastAction = 0; 
 }
 
 function initChart() {
@@ -328,7 +321,6 @@ document.getElementById('add-plate-button').onclick = () => {
     const p = priceSelect.value;
     const c = parseInt(plateCountInput.value);
     
-    // ★追加：追加した枚数を記録してアニメさせる
     platesAddedInLastAction = c > 0 ? c : 0;
     
     actionHistory.push({ price: p, count: c });
