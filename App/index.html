@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sushi Log v0.19</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="title-screen" class="screen full-height">
+        <div class="hero">
+            <h1>🍣 Sushi Log</h1>
+            <p>お店を選んでスタート</p>
+            
+            <div id="preset-selector" class="preset-grid"></div>
+            <button id="open-settings" class="btn-text">⚙️ プリセットを編集</button>
+        </div>
+    </div>
+
+    <div id="main-screen" class="screen hidden">
+        <header id="app-bar" class="app-bar">
+            <button id="back-to-title" class="btn-icon">←</button>
+            <h2 id="current-shop-name">Sushi Log</h2>
+            <button id="theme-toggle" class="btn-icon">🌓</button>
+        </header>
+
+        <main class="container">
+            <div id="budget-guide" class="guide-box"></div>
+
+            <section class="card summary-card">
+                <div class="price-main">
+                    <span id="total-display">0</span><small>円</small>
+                </div>
+                <div id="budget-display" class="budget-sub">予算: 未設定</div>
+            </section>
+
+            <section class="visual-grid">
+                <div class="card v-card">
+                    <h3>お皿タワー</h3>
+                    <div id="sushi-tower"></div>
+                </div>
+                <div class="card v-card">
+                    <h3>内訳構成</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="price-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card input-section">
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>単価選択</label>
+                        <select id="price-select"></select>
+                    </div>
+                    <div class="input-group">
+                        <label>枚数</label>
+                        <div class="stepper-large">
+                            <button id="count-minus">−</button>
+                            <input type="number" id="plate-count" value="1" readonly>
+                            <button id="count-plus">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="quick-add-buttons" class="chip-group"></div>
+                <button id="add-plate-button" class="btn-primary btn-block">お皿を確定</button>
+            </section>
+
+            <section class="action-grid">
+                <button id="set-budget-button" class="btn-outline">予算設定</button>
+                <button id="export-csv-button" class="btn-outline">CSV出力</button>
+                <button id="save-button" class="btn-outline">保存</button>
+                <button id="reset-button" class="btn-danger">リセット</button>
+            </section>
+
+            <section class="details">
+                <details>
+                    <summary>詳細データ</summary>
+                    <div id="summary-area" class="info-box"></div>
+                    <div id="stats-area" class="info-box"></div>
+                </details>
+                <details>
+                    <summary>履歴・ログ</summary>
+                    <div id="history-area" class="info-box"></div>
+                    <div id="output-area" class="info-box"></div>
+                </details>
+            </section>
+        </main>
+    </div>
+
+    <div id="settings-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>店舗プリセット設定</h3>
+            <div id="settings-list"></div>
+            <button id="add-new-preset" class="btn-outline btn-block">+ 新しいお店を追加</button>
+            <button id="close-settings" class="btn-primary btn-block" style="margin-top:20px;">保存して閉じる</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

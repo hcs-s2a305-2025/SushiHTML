@@ -1,0 +1,70 @@
+:root {
+    --bg: #f8f9fa;
+    --card-bg: #ffffff;
+    --primary: #d32f2f;
+    --text: #212121;
+    --text-sub: #757575;
+    --border: #e0e0e0;
+    --guide-bg: #fff9c4;
+    --danger: #ff5252;
+}
+
+[data-theme="dark"] {
+    --bg: #121212;
+    --card-bg: #1e1e1e;
+    --text: #e0e0e0;
+    --text-sub: #b0b0b0;
+    --border: #333333;
+    --guide-bg: #332d00;
+}
+
+body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; overflow-x: hidden; }
+.screen { transition: 0.3s; }
+
+.hidden { display: none !important; }
+
+.full-height { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+
+.container { padding: 16px; max-width: 500px; margin: 0 auto; }
+.card { background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); }
+
+/* タイトル画面・プリセット選択 */
+.preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 90%; max-width: 400px; margin: 20px 0; }
+.preset-chip { background: var(--card-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border); cursor: pointer; text-align: left; }
+
+/* メイン画面 */
+.app-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; background: var(--card-bg); position: sticky; top: 0; z-index: 100; }
+
+/* ★修正箇所：グラデーションを外し、店舗のカラーがきれいに反映されるように単色化 + アニメーション付与 */
+.summary-card { text-align: center; background: var(--primary); color: white; border: none; transition: background 0.3s ease; }
+.price-main { font-size: 3rem; font-weight: bold; }
+
+.visual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.v-card { height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+#sushi-tower { display: flex; flex-direction: column-reverse; width: 50px; height: 120px; overflow-y: auto; border-bottom: 3px solid var(--border); }
+.plate-visual { width: 40px; height: 5px; border-radius: 10px; margin-bottom: 1px; flex-shrink: 0; }
+.chart-wrapper { height: 120px; width: 120px; }
+
+/* 入力エリア */
+.stepper-large { display: flex; align-items: center; gap: 10px; }
+.stepper-large input { width: 50px; text-align: center; font-size: 1.2rem; border: none; background: transparent; color: var(--text); }
+
+/* ★修正箇所：ボタンの色変更を滑らかにする transition を追加 */
+.btn-primary { background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; transition: background 0.3s ease; }
+
+.btn-block { width: 100%; padding: 15px; margin-top: 10px; font-size: 1rem; }
+.action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-sub); padding: 10px; border-radius: 10px; }
+.btn-danger { color: var(--danger); border: 1px solid var(--danger); background: transparent; padding: 10px; border-radius: 10px; }
+.btn-text { background: none; border: none; color: var(--text-sub); margin-top: 20px; text-decoration: underline; cursor: pointer; }
+
+/* クイック追加ボタン（チップ） */
+.chip-group { display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; }
+.chip { padding: 8px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text); font-size: 0.85rem; cursor: pointer; }
+
+/* モーダル */
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 2000; }
+.modal-content { background: var(--bg); width: 90%; max-width: 400px; padding: 20px; border-radius: 20px; max-height: 80vh; overflow-y: auto; }
+.settings-item { margin-bottom: 10px; }
+.settings-item input[type="text"] { width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 8px; }
+.btn-danger-small { background: none; border: 1px solid var(--danger); color: var(--danger); padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; }
