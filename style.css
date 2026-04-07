@@ -1,3 +1,6 @@
+/* =========================================
+   1. ベースカラー設定（テーマ変数）
+========================================= */
 :root {
     --bg: #f8f9fa;
     --card-bg: #ffffff;
@@ -18,7 +21,27 @@
     --guide-bg: #332d00;
 }
 
-body { font-family: 'Zen Maru Gothic', -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; overflow-x: hidden; }
+/* =========================================
+   2. ベーススタイル・スマホ最適化
+========================================= */
+body { 
+    font-family: 'Zen Maru Gothic', -apple-system, sans-serif; 
+    background: var(--bg); 
+    color: var(--text); 
+    margin: 0; 
+    overflow-x: hidden; 
+    
+    /* ★追加：連打中の意図しないテキスト選択を防止 */
+    user-select: none; 
+    -webkit-user-select: none;
+}
+
+/* ★追加：入力欄だけはテキスト選択を許可する */
+input, textarea, select {
+    user-select: auto;
+    -webkit-user-select: auto;
+}
+
 .screen { transition: 0.3s; }
 .hidden { display: none !important; }
 
@@ -26,6 +49,9 @@ body { font-family: 'Zen Maru Gothic', -apple-system, sans-serif; background: va
 .container { padding: 16px; max-width: 500px; margin: 0 auto; }
 .card { background: var(--card-bg); border-radius: 16px; padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
 
+/* =========================================
+   3. UIパーツ（タイトル・ヘッダー・ボタン）
+========================================= */
 .preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 90%; max-width: 400px; margin: 25px 0; }
 .preset-chip { background: var(--card-bg); padding: 20px 15px; border-radius: 12px; border: 1px solid var(--border); cursor: pointer; text-align: left; }
 
@@ -35,10 +61,32 @@ body { font-family: 'Zen Maru Gothic', -apple-system, sans-serif; background: va
 .summary-card { text-align: center; background: var(--primary); color: white; border: none; transition: background 0.3s ease; }
 .price-main { font-size: 3rem; font-weight: bold; }
 
+/* ★追加：タップ可能な要素へのダブルタップズーム防止処理 */
+button, .chip, .preset-chip, .btn-icon, select, input {
+    touch-action: manipulation; /* これがズームを完全にブロックする魔法のCSSです */
+}
+
+button { transition: transform 0.1s ease, background-color 0.2s; font-family: inherit; }
+button:active { transform: scale(0.95); } /* 押した時のへこみエフェクト */
+
+.btn-primary { background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
+.btn-block { width: 100%; padding: 15px; margin-top: 10px; font-size: 1rem; }
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-sub); padding: 10px; border-radius: 10px; font-weight: bold; }
+.btn-danger { color: var(--danger); border: 1px solid var(--danger); background: transparent; padding: 10px; border-radius: 10px; font-weight: bold; }
+.btn-text { background: none; border: none; color: var(--text-sub); margin-top: 20px; text-decoration: underline; cursor: pointer; }
+
+/* クイック追加チップ */
+.chip-group { display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; }
+.chip { padding: 10px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text); font-size: 0.9rem; font-weight: bold; cursor: pointer; }
+.chip:active { background-color: var(--primary); color: white; transform: scale(0.9) translateY(2px); }
+
+
+/* =========================================
+   4. 視覚化エリア（お皿タワー・円グラフ）
+========================================= */
 .visual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .v-card { height: 210px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
-/* ★変更：column-reverse をやめて column に。これでスクロールが安定します */
 #sushi-tower { display: flex; flex-direction: column; width: 80px; height: 140px; overflow-y: auto; overflow-x: hidden; border-bottom: 3px solid var(--border); padding-right: 15px; padding-bottom: 5px; scroll-behavior: smooth; }
 .plate-visual { 
     width: 50px; height: 12px; border-radius: 50% / 50%; margin-bottom: -5px;      
@@ -57,10 +105,13 @@ body { font-family: 'Zen Maru Gothic', -apple-system, sans-serif; background: va
 .chart-wrapper { height: 120px; width: 120px; position: relative; display: flex; align-items: center; justify-content: center; }
 .chart-center { position: absolute; font-weight: bold; font-size: 1.2rem; pointer-events: none; color: var(--text); }
 
+
+/* =========================================
+   5. 入力・お会計計算エリア
+========================================= */
 .input-row { display: flex; gap: 10px; align-items: center; }
 .input-group label { display: block; font-size: 0.85rem; color: var(--text-sub); margin-bottom: 4px; }
 
-/* 共通入力系デザイン */
 .custom-price-area { display: flex; gap: 8px; margin-bottom: 15px; }
 .styled-input, .styled-select { 
     flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); 
@@ -71,31 +122,23 @@ body { font-family: 'Zen Maru Gothic', -apple-system, sans-serif; background: va
 .stepper-large { display: flex; align-items: center; gap: 10px; }
 .stepper-large input { width: 50px; text-align: center; font-size: 1.2rem; border: none; background: transparent; color: var(--text); font-family: inherit; font-weight: bold; }
 
-button { transition: transform 0.1s ease, background-color 0.2s; font-family: inherit; }
-button:active { transform: scale(0.95); }
-
-.btn-primary { background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
-.btn-block { width: 100%; padding: 15px; margin-top: 10px; font-size: 1rem; }
-.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-sub); padding: 10px; border-radius: 10px; font-weight: bold; }
-.btn-danger { color: var(--danger); border: 1px solid var(--danger); background: transparent; padding: 10px; border-radius: 10px; font-weight: bold; }
-.btn-text { background: none; border: none; color: var(--text-sub); margin-top: 20px; text-decoration: underline; cursor: pointer; }
-
-.chip-group { display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0; }
-.chip { padding: 10px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text); font-size: 0.9rem; font-weight: bold; cursor: pointer; }
-.chip:active { background-color: var(--primary); color: white; transform: scale(0.9) translateY(2px); }
-
-.details-section { margin-top: 10px; }
-.details-card { padding: 16px; margin-bottom: 12px; }
-.details-card summary { font-weight: bold; cursor: pointer; outline: none; margin-bottom: 10px; list-style-position: inside; }
-.details-content { margin-top: 10px; }
-.info-box { background: var(--bg); padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border); font-size: 0.9rem; }
-
+/* お会計計算デザイン */
 .checkout-card { border: 2px solid var(--primary); margin-bottom: 30px; }
 .checkout-card h3 { margin-top: 0; margin-bottom: 12px; font-size: 1.1rem; color: var(--primary); border-bottom: 1px dashed var(--border); padding-bottom: 8px; }
 .checkout-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
 .checkout-result { background: var(--bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border); font-size: 0.95rem; text-align: center; }
 .split-result { font-size: 1.1rem; font-weight: bold; margin-top: 8px; color: var(--primary); }
 .highlight-text { font-size: 1.8rem; }
+
+
+/* =========================================
+   6. 詳細データ・履歴・モーダル
+========================================= */
+.details-section { margin-top: 10px; }
+.details-card { padding: 16px; margin-bottom: 12px; }
+.details-card summary { font-weight: bold; cursor: pointer; outline: none; margin-bottom: 10px; list-style-position: inside; }
+.details-content { margin-top: 10px; }
+.info-box { background: var(--bg); padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border); font-size: 0.9rem; }
 
 .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 2000; backdrop-filter: blur(3px); }
 .modal-content { background: var(--bg); width: 90%; max-width: 400px; padding: 20px; border-radius: 20px; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }

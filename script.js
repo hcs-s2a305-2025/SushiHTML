@@ -1,46 +1,60 @@
-let plateCounts = {}; 
-let totalHistory = [];
-let actionHistory = [];
-let budget = Infinity;
-let myChart = null;
-let wakeLock = null; 
+// ==========================================
+// 1. グローバル変数と状態管理
+// ==========================================
+let plateCounts = {};             // 食べたお皿の記録 {金額: 枚数}
+let totalHistory = [];            // 過去のセッションの合計金額履歴
+let actionHistory = [];           // Undo(取り消し)用の操作履歴
+let budget = Infinity;            // 設定された予算
+let myChart = null;               // Chart.jsのインスタンス
+let wakeLock = null;              // 画面消灯防止用オブジェクト
 
-let currentTotalAmount = 0; 
-let platesAddedInLastAction = 0; 
+let currentTotalAmount = 0;       // アニメーションカウントアップ用の一時保存金額
+let platesAddedInLastAction = 0;  // 落下アニメーション制御用
 
+// 店舗の初期プリセットデータ
 let presets = [
     { name: "スシロー", color: "#d32f2f", prices: [120, 180, 260, 360] },
     { name: "くら寿司", color: "#2e7d32", prices: [115, 165, 250] },
     { name: "はま寿司", color: "#0277bd", prices: [110, 165, 319] }
 ];
-let currentPresetIndex = 0;
-let currentSessionPrices = []; 
+let currentPresetIndex = 0;       // 現在選択されている店舗のインデックス
+let currentSessionPrices = [];    // 現在のセッションで有効な価格リスト（カスタム追加用）
 
+// 頻繁にアクセスするDOM要素
 const priceSelect = document.getElementById('price-select');
 const plateCountInput = document.getElementById('plate-count');
 const towerContainer = document.getElementById('sushi-tower');
+
+
+// ==========================================
+// 2. 初期化・ユーティリティ関数
+// ==========================================
 
 window.onload = () => {
     loadData();
     renderPresetChips();
     initChart();
+    // ダークモードの復元
     if(localStorage.getItem('theme') === 'dark') document.body.setAttribute('data-theme', 'dark');
 };
 
+// XSS（スクリプトインジェクション）対策：HTML特殊文字を無害化する
 function escapeHTML(str) {
     return String(str).replace(/[&<>'"]/g, function(match) {
         return { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[match];
     });
 }
 
+// スマホのバイブレーション（振動）を呼び出す
 function triggerVibrate(ms) {
-    if (navigator.vibrate) {
-        navigator.vibrate(ms);
-    }
+    if (navigator.vibrate) navigator.vibrate(ms);
 }
 
+// データの読み込み (v28から順に古いデータを探す)
 function loadData() {
-    let saved = localStorage.getItem('sushi_log_v26_data') || localStorage.getItem('sushi_log_v25_data');
+    let saved = localStorage.getItem('sushi_log_v28_data') || 
+                localStorage.getItem('sushi_log_v27_data') || 
+                localStorage.getItem('sushi_log_v26_data');
     if (saved) {
         const data = JSON.parse(saved);
         presets = data.presets || presets;
@@ -48,11 +62,13 @@ function loadData() {
     }
 }
 
+// データの保存
 function saveData() {
     const data = { presets, totalHistory };
-    localStorage.setItem('sushi_log_v26_data', JSON.stringify(data));
+    localStorage.setItem('sushi_log_v28_data', JSON.stringify(data));
 }
 
+// 画面の自動消灯をブロックするリクエスト
 async function requestWakeLock() {
     if ('wakeLock' in navigator) {
         try { wakeLock = await navigator.wakeLock.request('screen'); } 
@@ -60,6 +76,12 @@ async function requestWakeLock() {
     }
 }
 
+
+// ==========================================
+// 3. 画面の遷移・描画処理
+// ==========================================
+
+// タイトル画面：店舗ボタンの生成
 function renderPresetChips() {
     const container = document.getElementById('preset-selector');
     container.innerHTML = '';
@@ -77,6 +99,7 @@ function renderPresetChips() {
     });
 }
 
+// お店を選んでセッション開始
 function startSession() {
     const p = presets[currentPresetIndex];
     document.getElementById('current-shop-name').innerText = escapeHTML(p.name);
@@ -90,6 +113,7 @@ function startSession() {
     actionHistory = []; 
     currentTotalAmount = 0;
     
+    // お会計計算エリアのリセット
     document.getElementById('discount-val').value = '';
     document.getElementById('split-count').value = '1';
 
@@ -99,9 +123,10 @@ function startSession() {
     
     requestWakeLock();
     addLog(`${escapeHTML(p.name)} でのセッションを開始しました。`);
-    updateAll();
+    updateAll(); // 全画面更新
 }
 
+// ドロップダウンとクイック追加ボタン（チップ）の更新
 function updatePriceSelectAndChips() {
     priceSelect.innerHTML = '';
     currentSessionPrices.forEach(price => {
@@ -110,19 +135,16 @@ function updatePriceSelectAndChips() {
         opt.innerText = `${price}円`;
         priceSelect.appendChild(opt);
     });
-    renderQuickAddButtons(currentSessionPrices);
-}
-
-function renderQuickAddButtons(prices) {
+    
     const container = document.getElementById('quick-add-buttons');
     container.innerHTML = '';
-    prices.forEach(price => {
+    currentSessionPrices.forEach(price => {
         const btn = document.createElement('button');
         btn.className = 'chip';
         btn.innerText = `+${price}円`;
         btn.onclick = () => {
             triggerVibrate(40); 
-            platesAddedInLastAction = 1; 
+            platesAddedInLastAction = 1; // 落下アニメーションの対象は1枚
             actionHistory.push({ price: price, count: 1 });
             plateCounts[price] = (plateCounts[price] || 0) + 1;
             addLog(`${price}円のお皿を 1 枚追加しました。`);
@@ -132,87 +154,16 @@ function renderQuickAddButtons(prices) {
     });
 }
 
-document.getElementById('add-custom-price-btn').onclick = () => {
-    const inputField = document.getElementById('custom-price-input');
-    const newPrice = parseInt(inputField.value);
-    if (!newPrice || newPrice <= 0) { alert("正しい金額を入力してください"); return; }
-    if (!currentSessionPrices.includes(newPrice)) {
-        currentSessionPrices.push(newPrice);
-        currentSessionPrices.sort((a, b) => a - b);
-        updatePriceSelectAndChips();
-        addLog(`【新規】${escapeHTML(newPrice)}円のお皿を追加しました。`);
-    }
-    priceSelect.value = newPrice;
-    inputField.value = '';
-    triggerVibrate(30);
-};
 
-document.getElementById('open-settings').onclick = () => {
-    const list = document.getElementById('settings-list');
-    list.innerHTML = '';
-    presets.forEach((p, i) => {
-        const div = document.createElement('div');
-        div.className = 'settings-item card';
-        div.innerHTML = `
-            <input type="text" value="${escapeHTML(p.name)}" onchange="presets[${i}].name=this.value">
-            <div style="display:flex; gap:8px; margin-top:8px;">
-                <input type="color" value="${escapeHTML(p.color)}" onchange="presets[${i}].color=this.value">
-                <input type="text" value="${p.prices.join(',')}" onchange="presets[${i}].prices=this.value.split(',').map(Number)">
-                <button class="btn-danger-small" onclick="presets.splice(${i},1); document.getElementById('open-settings').click();">削除</button>
-            </div>
-        `;
-        list.appendChild(div);
-    });
-    document.getElementById('settings-modal').classList.remove('hidden');
-};
-document.getElementById('add-new-preset').onclick = () => {
-    presets.push({ name: "新しいお店", color: "#666666", prices: [100, 200] });
-    document.getElementById('open-settings').click();
-};
-document.getElementById('close-settings').onclick = () => {
-    saveData();
-    renderPresetChips();
-    document.getElementById('settings-modal').classList.add('hidden');
-};
+// ==========================================
+// 4. データ更新・計算処理（コアロジック）
+// ==========================================
 
-document.getElementById('help-button').onclick = () => document.getElementById('help-modal').classList.remove('hidden');
-document.getElementById('close-help').onclick = () => document.getElementById('help-modal').classList.add('hidden');
-document.getElementById('action-menu-button').onclick = () => document.getElementById('action-menu-modal').classList.remove('hidden');
-document.getElementById('close-action-menu').onclick = () => document.getElementById('action-menu-modal').classList.add('hidden');
-
-function undoLastAction() {
-    if (actionHistory.length === 0) return;
-    const last = actionHistory.pop();
-    if (plateCounts[last.price]) {
-        plateCounts[last.price] -= last.count;
-        if (plateCounts[last.price] <= 0) delete plateCounts[last.price];
-        platesAddedInLastAction = 0; 
-        addLog(`【取消】${last.price}円のお皿の操作を元に戻しました。`);
-        triggerVibrate(30);
-        updateAll();
-    }
-}
-
-function addLog(message) {
-    const outputArea = document.getElementById('output-area');
-    const time = new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    outputArea.innerHTML = `<div style="font-size: 0.9em; margin-bottom: 4px; border-bottom: 1px dashed var(--border); padding-bottom: 2px;">[${time}] ${message}</div>` + outputArea.innerHTML;
-}
-
-function animateValue(obj, start, end, duration) {
-    let startTimestamp = null;
-    const step = (timestamp) => {
-        if (!startTimestamp) startTimestamp = timestamp;
-        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-        const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-        obj.innerHTML = Math.floor(start + easeOutQuart * (end - start)).toLocaleString();
-        if (progress < 1) window.requestAnimationFrame(step);
-    };
-    window.requestAnimationFrame(step);
-}
-
+// すべてのUI（タワー、グラフ、金額、ログ）を最新状態に更新する
 function updateAll() {
     const total = Object.entries(plateCounts).reduce((acc, [p, c]) => acc + (p * c), 0);
+    
+    // 合計金額のカウントアップアニメーション
     const totalDisplay = document.getElementById('total-display');
     animateValue(totalDisplay, currentTotalAmount, total, 600);
     currentTotalAmount = total;
@@ -225,6 +176,7 @@ function updateAll() {
     updateCheckoutArea(total);
 }
 
+// お皿タワーの描画とアニメーション
 function updateTower() {
     towerContainer.innerHTML = '';
     const color = presets[currentPresetIndex].color;
@@ -240,23 +192,24 @@ function updateTower() {
         }
     });
 
+    // 最後に追加された枚数分だけ落下アニメーション用のクラスを付与
     if (platesAddedInLastAction > 0 && domPlates.length >= platesAddedInLastAction) {
         for (let i = domPlates.length - platesAddedInLastAction; i < domPlates.length; i++) {
             domPlates[i].classList.add('drop-in');
         }
     }
     
-    // ★変更：要素が少ない時に「下」に押し付けるためのスペーサーを一番上に追加
+    // 画面下部に押し付けるためのスペーサー
     const spacer = document.createElement('div');
     spacer.style.marginTop = 'auto';
     towerContainer.appendChild(spacer);
 
-    // ★変更：新しいお皿（配列の後ろ）から順に上から積んでいく
+    // 配列の後ろ（新しい皿）から順に上から積んでいく
     for (let i = domPlates.length - 1; i >= 0; i--) {
-        domPlates[i].style.zIndex = i + 1; // 上の皿ほど前面に出るようにする
+        domPlates[i].style.zIndex = i + 1;
         towerContainer.appendChild(domPlates[i]);
         
-        // 10枚ごとにマーカーを挿入（下から数えた枚数）
+        // 10枚ごとにマーカーを挿入
         if ((i + 1) % 10 === 0) {
             const marker = document.createElement('div');
             marker.className = 'tower-marker';
@@ -265,15 +218,14 @@ function updateTower() {
         }
     }
 
-    // ★変更：タワーのコンテナ「内」だけを確実にscrollTop=0（一番上）にスクロール
+    // 要素追加後、スクロール位置を一番上にリセット
     if (platesAddedInLastAction > 0) {
-        setTimeout(() => {
-            towerContainer.scrollTo({ top: 0, behavior: 'smooth' });
-        }, 50);
+        setTimeout(() => towerContainer.scrollTo({ top: 0, behavior: 'smooth' }), 50);
     }
-    platesAddedInLastAction = 0; 
+    platesAddedInLastAction = 0; // アニメフラグのリセット
 }
 
+// 円グラフの初期化と更新
 function initChart() {
     const ctx = document.getElementById('price-chart').getContext('2d');
     myChart = new Chart(ctx, {
@@ -282,7 +234,6 @@ function initChart() {
         options: { plugins: { legend: { display: false } }, cutout: '75%', animation: { duration: 500 } }
     });
 }
-
 function updateChart() {
     myChart.data.labels = Object.keys(plateCounts).map(p => `${p}円`);
     myChart.data.datasets[0].data = Object.values(plateCounts);
@@ -292,11 +243,11 @@ function updateChart() {
     document.getElementById('chart-center-text').innerText = `${totalPlates}枚`;
 }
 
+// 内訳テキスト・予算ガイドの更新
 function updateTexts(total) {
     const summaryArea = document.getElementById('summary-area');
     const undoBtnHtml = actionHistory.length > 0 
-        ? `<button onclick="undoLastAction()" class="btn-outline" style="width:100%; margin-bottom:10px; cursor:pointer;">↩️ 1つ取り消す</button>` 
-        : '';
+        ? `<button onclick="undoLastAction()" class="btn-outline" style="width:100%; margin-bottom:10px; cursor:pointer;">↩️ 1つ取り消す</button>` : '';
         
     summaryArea.innerHTML = undoBtnHtml + Object.entries(plateCounts)
         .map(([p, c]) => `<div>${p}円 x ${c}枚 = ${(p*c).toLocaleString()}円</div>`).join('');
@@ -315,6 +266,7 @@ function updateTexts(total) {
     }
 }
 
+// 統計情報（平均単価など）の更新
 function updateStatsArea(totalAmount) {
     let totalPlates = 0, maxCount = 0, mostEatenPrice = 0;
     for (const [price, count] of Object.entries(plateCounts)) {
@@ -338,19 +290,16 @@ function updateHistoryArea() {
     historyArea.innerHTML = totalHistory.map((t, i) => `<div>セッション ${i + 1}: <strong>${t.toLocaleString()} 円</strong></div>`).join('');
 }
 
+// お会計（割り勘・割引）のリアルタイム計算
 function updateCheckoutArea(total) {
     const discountVal = parseFloat(document.getElementById('discount-val').value) || 0;
     const discountType = document.getElementById('discount-type').value;
     let splitCount = parseInt(document.getElementById('split-count').value) || 1;
-    
     if (splitCount < 1) splitCount = 1;
 
     let discountedTotal = total;
-    if (discountType === 'yen') {
-        discountedTotal -= discountVal;
-    } else if (discountType === 'percent') {
-        discountedTotal -= total * (discountVal / 100);
-    }
+    if (discountType === 'yen') discountedTotal -= discountVal;
+    else if (discountType === 'percent') discountedTotal -= total * (discountVal / 100);
     
     if (discountedTotal < 0) discountedTotal = 0;
     
@@ -360,21 +309,78 @@ function updateCheckoutArea(total) {
     document.getElementById('per-person-amount').innerText = perPerson.toLocaleString();
 }
 
+
+// ==========================================
+// 5. 各種アクション・イベントリスナー
+// ==========================================
+
+// ログの出力
+function addLog(message) {
+    const outputArea = document.getElementById('output-area');
+    const time = new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    outputArea.innerHTML = `<div style="font-size: 0.9em; margin-bottom: 4px; border-bottom: 1px dashed var(--border); padding-bottom: 2px;">[${time}] ${message}</div>` + outputArea.innerHTML;
+}
+
+// 1つ取り消す（Undo）
+function undoLastAction() {
+    if (actionHistory.length === 0) return;
+    const last = actionHistory.pop();
+    if (plateCounts[last.price]) {
+        plateCounts[last.price] -= last.count;
+        if (plateCounts[last.price] <= 0) delete plateCounts[last.price];
+        platesAddedInLastAction = 0; 
+        addLog(`【取消】${last.price}円のお皿の操作を元に戻しました。`);
+        triggerVibrate(30);
+        updateAll();
+    }
+}
+
+// 数字のカウントアップアニメーション
+function animateValue(obj, start, end, duration) {
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        const easeOutQuart = 1 - Math.pow(1 - progress, 4); // 滑らかな減速イージング
+        obj.innerHTML = Math.floor(start + easeOutQuart * (end - start)).toLocaleString();
+        if (progress < 1) window.requestAnimationFrame(step);
+    };
+    window.requestAnimationFrame(step);
+}
+
+// 新規カスタム金額の追加ボタン
+document.getElementById('add-custom-price-btn').onclick = () => {
+    const inputField = document.getElementById('custom-price-input');
+    const newPrice = parseInt(inputField.value);
+    if (!newPrice || newPrice <= 0) { alert("正しい金額を入力してください"); return; }
+    
+    if (!currentSessionPrices.includes(newPrice)) {
+        currentSessionPrices.push(newPrice);
+        currentSessionPrices.sort((a, b) => a - b);
+        updatePriceSelectAndChips();
+        addLog(`【新規】${escapeHTML(newPrice)}円のお皿を追加しました。`);
+    }
+    priceSelect.value = newPrice;
+    inputField.value = '';
+    triggerVibrate(30);
+};
+
+// お会計計算エリアの入力監視（即時反映用）
 document.getElementById('discount-val').addEventListener('input', () => updateAll());
 document.getElementById('discount-type').addEventListener('change', () => updateAll());
 document.getElementById('split-count').addEventListener('input', () => updateAll());
 
-
+// 枚数の増減ステッパー
 document.getElementById('count-plus').onclick = () => { plateCountInput.value++; triggerVibrate(20); };
 document.getElementById('count-minus').onclick = () => { if (plateCountInput.value > -99) plateCountInput.value--; triggerVibrate(20); };
 
+// メインの「お皿を確定」ボタン
 document.getElementById('add-plate-button').onclick = () => {
     triggerVibrate(50); 
     const p = priceSelect.value;
     const c = parseInt(plateCountInput.value);
     
     platesAddedInLastAction = c > 0 ? c : 0;
-    
     actionHistory.push({ price: p, count: c });
     plateCounts[p] = (plateCounts[p] || 0) + c;
     if (plateCounts[p] <= 0) delete plateCounts[p];
@@ -386,6 +392,41 @@ document.getElementById('add-plate-button').onclick = () => {
     plateCountInput.value = 1;
 };
 
+// 各種モーダルの開閉処理
+document.getElementById('open-settings').onclick = () => {
+    const list = document.getElementById('settings-list');
+    list.innerHTML = '';
+    presets.forEach((p, i) => {
+        const div = document.createElement('div');
+        div.className = 'settings-item card';
+        div.innerHTML = `
+            <input type="text" value="${escapeHTML(p.name)}" onchange="presets[${i}].name=this.value">
+            <div style="display:flex; gap:8px; margin-top:8px;">
+                <input type="color" value="${escapeHTML(p.color)}" onchange="presets[${i}].color=this.value">
+                <input type="text" value="${p.prices.join(',')}" onchange="presets[${i}].prices=this.value.split(',').map(Number)">
+                <button class="btn-danger-small" onclick="presets.splice(${i},1); document.getElementById('open-settings').click();">削除</button>
+            </div>
+        `;
+        list.appendChild(div);
+    });
+    document.getElementById('settings-modal').classList.remove('hidden');
+};
+document.getElementById('add-new-preset').onclick = () => {
+    presets.push({ name: "新しいお店", color: "#666666", prices: [100, 200] });
+    document.getElementById('open-settings').click(); // 再描画
+};
+document.getElementById('close-settings').onclick = () => {
+    saveData();
+    renderPresetChips();
+    document.getElementById('settings-modal').classList.add('hidden');
+};
+
+document.getElementById('help-button').onclick = () => document.getElementById('help-modal').classList.remove('hidden');
+document.getElementById('close-help').onclick = () => document.getElementById('help-modal').classList.add('hidden');
+document.getElementById('action-menu-button').onclick = () => document.getElementById('action-menu-modal').classList.remove('hidden');
+document.getElementById('close-action-menu').onclick = () => document.getElementById('action-menu-modal').classList.add('hidden');
+
+// ヘッダーのアクションボタン群
 document.getElementById('back-to-title').onclick = () => {
     document.getElementById('main-screen').classList.add('hidden');
     document.getElementById('title-screen').classList.remove('hidden');
