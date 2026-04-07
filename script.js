@@ -12,6 +12,7 @@ let presets = [
     { name: "はま寿司", color: "#0277bd", prices: [110, 165, 319] }
 ];
 let currentPresetIndex = 0;
+let currentSessionPrices = []; // ★現在のセッションで有効な金額リスト
 
 const priceSelect = document.getElementById('price-select');
 const plateCountInput = document.getElementById('plate-count');
@@ -25,7 +26,7 @@ window.onload = () => {
 };
 
 function loadData() {
-    const saved = localStorage.getItem('sushi_log_v19_data');
+    const saved = localStorage.getItem('sushi_log_v20_data');
     if (saved) {
         const data = JSON.parse(saved);
         presets = data.presets || presets;
@@ -35,10 +36,9 @@ function loadData() {
 
 function saveData() {
     const data = { presets, totalHistory };
-    localStorage.setItem('sushi_log_v19_data', JSON.stringify(data));
+    localStorage.setItem('sushi_log_v20_data', JSON.stringify(data));
 }
 
-// ★追加：画面消灯を防ぐ関数
 async function requestWakeLock() {
     if ('wakeLock' in navigator) {
         try {
@@ -49,7 +49,6 @@ async function requestWakeLock() {
     }
 }
 
-// プリセット選択画面の描画
 function renderPresetChips() {
     const container = document.getElementById('preset-selector');
     container.innerHTML = '';
@@ -70,29 +69,35 @@ function startSession() {
     const p = presets[currentPresetIndex];
     document.getElementById('current-shop-name').innerText = p.name;
     document.getElementById('app-bar').style.borderBottom = `4px solid ${p.color}`;
-    
     document.documentElement.style.setProperty('--primary', p.color);
     
+    // セッション用の価格リストを初期化
+    currentSessionPrices = [...p.prices];
+    updatePriceSelectAndChips();
+
+    plateCounts = {};
+    actionHistory = []; 
+    document.getElementById('output-area').innerHTML = ''; 
+    document.getElementById('title-screen').classList.add('hidden');
+    document.getElementById('main-screen').classList.remove('hidden');
+    
+    requestWakeLock();
+    addLog(`${p.name} でのセッションを開始しました。`);
+    updateAll();
+}
+
+// ★追加：セレクトボックスとチップを更新する共通関数
+function updatePriceSelectAndChips() {
     priceSelect.innerHTML = '';
-    p.prices.forEach(price => {
+    currentSessionPrices.forEach(price => {
         const opt = document.createElement('option');
         opt.value = price;
         opt.innerText = `${price}円`;
         priceSelect.appendChild(opt);
     });
-
-    renderQuickAddButtons(p.prices);
-
-    plateCounts = {};
-    actionHistory = []; // 履歴リセット
-    document.getElementById('title-screen').classList.add('hidden');
-    document.getElementById('main-screen').classList.remove('hidden');
-    
-    requestWakeLock(); // ★追加：セッション開始時に常時点灯リクエスト
-    updateAll();
+    renderQuickAddButtons(currentSessionPrices);
 }
 
-// クイック追加ボタンを描画
 function renderQuickAddButtons(prices) {
     const container = document.getElementById('quick-add-buttons');
     container.innerHTML = '';
@@ -101,16 +106,36 @@ function renderQuickAddButtons(prices) {
         btn.className = 'chip';
         btn.innerText = `+${price}円`;
         btn.onclick = () => {
-            // ★変更：履歴に追加
             actionHistory.push({ price: price, count: 1 });
             plateCounts[price] = (plateCounts[price] || 0) + 1;
+            addLog(`${price}円のお皿を 1 枚追加しました。`);
             updateAll();
         };
         container.appendChild(btn);
     });
 }
 
-// 設定モーダルの制御
+// ★追加：カスタム金額の追加処理
+document.getElementById('add-custom-price-btn').onclick = () => {
+    const inputField = document.getElementById('custom-price-input');
+    const newPrice = parseInt(inputField.value);
+    
+    if (!newPrice || newPrice <= 0) {
+        alert("正しい金額を入力してください");
+        return;
+    }
+    
+    if (!currentSessionPrices.includes(newPrice)) {
+        currentSessionPrices.push(newPrice);
+        currentSessionPrices.sort((a, b) => a - b); // 金額順に並び替え
+        updatePriceSelectAndChips();
+        addLog(`【新規】${newPrice}円のお皿をメニューに追加しました。`);
+    }
+    
+    priceSelect.value = newPrice; // セレクトボックスを追加した金額に合わせる
+    inputField.value = ''; // 入力欄をクリア
+};
+
 document.getElementById('open-settings').onclick = () => {
     const list = document.getElementById('settings-list');
     list.innerHTML = '';
@@ -141,36 +166,54 @@ document.getElementById('close-settings').onclick = () => {
     document.getElementById('settings-modal').classList.add('hidden');
 };
 
-// ★追加：Undo（1手戻す）関数
 function undoLastAction() {
     if (actionHistory.length === 0) return;
     const last = actionHistory.pop();
     if (plateCounts[last.price]) {
         plateCounts[last.price] -= last.count;
         if (plateCounts[last.price] <= 0) delete plateCounts[last.price];
+        addLog(`【取消】${last.price}円のお皿の操作を元に戻しました。`);
         updateAll();
     }
 }
 
-// 共通更新処理
+function addLog(message) {
+    const outputArea = document.getElementById('output-area');
+    const time = new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    outputArea.innerHTML = `<div style="font-size: 0.9em; margin-bottom: 4px; border-bottom: 1px dashed var(--border); padding-bottom: 2px;">[${time}] ${message}</div>` + outputArea.innerHTML;
+}
+
 function updateAll() {
     const total = Object.entries(plateCounts).reduce((acc, [p, c]) => acc + (p * c), 0);
     document.getElementById('total-display').innerText = total.toLocaleString();
     updateTower();
     updateChart();
     updateTexts(total);
+    updateStatsArea(total);
+    updateHistoryArea();
 }
 
 function updateTower() {
     towerContainer.innerHTML = '';
     const color = presets[currentPresetIndex].color;
+    let totalStacked = 0; // ★追加：積み上げた枚数のカウンター
+
     Object.entries(plateCounts).forEach(([price, count]) => {
         for (let i = 0; i < count; i++) {
+            totalStacked++;
             const p = document.createElement('div');
             p.className = 'plate-visual';
             p.style.backgroundColor = color;
-            p.style.opacity = 0.5 + (price / 1000); 
+            p.style.opacity = Math.min(1.0, 0.5 + (price / 1000));
             towerContainer.appendChild(p);
+
+            // ★追加：10枚ごとに目盛りを挿入
+            if (totalStacked % 10 === 0) {
+                const marker = document.createElement('div');
+                marker.className = 'tower-marker';
+                marker.innerHTML = `<span>${totalStacked}</span>`;
+                towerContainer.appendChild(marker);
+            }
         }
     });
 }
@@ -180,7 +223,7 @@ function initChart() {
     myChart = new Chart(ctx, {
         type: 'doughnut',
         data: { labels: [], datasets: [{ data: [], backgroundColor: ['#ff5252', '#448aff', '#4caf50', '#ffeb3b', '#9c27b0'] }] },
-        options: { plugins: { legend: { display: false } }, cutout: '70%' }
+        options: { plugins: { legend: { display: false } }, cutout: '75%' } // cutoutを少し広げて文字を見やすく
     });
 }
 
@@ -188,22 +231,25 @@ function updateChart() {
     myChart.data.labels = Object.keys(plateCounts).map(p => `${p}円`);
     myChart.data.datasets[0].data = Object.values(plateCounts);
     myChart.update();
+
+    // ★追加：総枚数を計算して中央テキストに反映
+    const totalPlates = Object.values(plateCounts).reduce((acc, c) => acc + c, 0);
+    document.getElementById('chart-center-text').innerText = `${totalPlates}枚`;
 }
 
 function updateTexts(total) {
-    // ★変更：Undoボタンを動的に表示
     const summaryArea = document.getElementById('summary-area');
     const undoBtnHtml = actionHistory.length > 0 
         ? `<button onclick="undoLastAction()" class="btn-outline" style="width:100%; margin-bottom:10px; cursor:pointer;">↩️ 1つ取り消す</button>` 
         : '';
         
     summaryArea.innerHTML = undoBtnHtml + Object.entries(plateCounts)
-        .map(([p, c]) => `<div>${p}円 x ${c}枚 = ${p*c}円</div>`).join('');
+        .map(([p, c]) => `<div>${p}円 x ${c}枚 = ${(p*c).toLocaleString()}円</div>`).join('');
     
     const budgetDisp = document.getElementById('budget-display');
     const guide = document.getElementById('budget-guide');
     if (budget !== Infinity) {
-        budgetDisp.innerText = `予算: ${budget}円 (残: ${budget - total}円)`;
+        budgetDisp.innerText = `予算: ${budget.toLocaleString()}円 (残: ${(budget - total).toLocaleString()}円)`;
         guide.style.display = 'block';
         
         if (total > budget) {
@@ -222,7 +268,41 @@ function updateTexts(total) {
     }
 }
 
-// ボタン操作
+function updateStatsArea(totalAmount) {
+    let totalPlates = 0;
+    let maxCount = 0;
+    let mostEatenPrice = 0;
+
+    for (const [price, count] of Object.entries(plateCounts)) {
+        totalPlates += count;
+        if (count > maxCount) {
+            maxCount = count;
+            mostEatenPrice = price;
+        }
+    }
+
+    const statsArea = document.getElementById('stats-area');
+    if (totalPlates > 0) {
+        const averagePrice = (totalAmount / totalPlates).toFixed(1);
+        statsArea.innerHTML = `
+            <div><strong>総枚数:</strong> ${totalPlates} 枚</div>
+            <div><strong>平均単価:</strong> ${averagePrice} 円</div>
+            <div style="margin-top: 5px;"><strong>一番多く食べたお皿:</strong><br> ${mostEatenPrice}円 (${maxCount}枚)</div>
+        `;
+    } else {
+        statsArea.innerHTML = "<div>お皿のデータがありません</div>";
+    }
+}
+
+function updateHistoryArea() {
+    const historyArea = document.getElementById('history-area');
+    if (totalHistory.length === 0) {
+        historyArea.innerHTML = "<div>過去のセッション記録はありません</div>";
+        return;
+    }
+    historyArea.innerHTML = totalHistory.map((t, i) => `<div>セッション ${i + 1}: <strong>${t.toLocaleString()} 円</strong></div>`).join('');
+}
+
 document.getElementById('count-plus').onclick = () => plateCountInput.value++;
 document.getElementById('count-minus').onclick = () => {
     if (plateCountInput.value > -99) plateCountInput.value--;
@@ -232,11 +312,13 @@ document.getElementById('add-plate-button').onclick = () => {
     const p = priceSelect.value;
     const c = parseInt(plateCountInput.value);
     
-    // ★変更：履歴に追加
     actionHistory.push({ price: p, count: c });
     
     plateCounts[p] = (plateCounts[p] || 0) + c;
     if (plateCounts[p] <= 0) delete plateCounts[p];
+    
+    const actionStr = c > 0 ? "追加" : "削除";
+    addLog(`${p}円のお皿を ${Math.abs(c)} 枚${actionStr}しました。`);
     
     updateAll();
     plateCountInput.value = 1;
@@ -247,7 +329,6 @@ document.getElementById('back-to-title').onclick = () => {
     document.getElementById('title-screen').classList.remove('hidden');
     document.documentElement.style.setProperty('--primary', '#d32f2f');
     
-    // ★追加：タイトルに戻る際はWake Lockを解除
     if (wakeLock !== null) {
         wakeLock.release().then(() => { wakeLock = null; });
     }
@@ -260,15 +341,65 @@ document.getElementById('theme-toggle').onclick = () => {
     localStorage.setItem('theme', isDark ? 'light' : 'dark');
 };
 
+document.getElementById('save-button').onclick = () => {
+    const total = Object.entries(plateCounts).reduce((acc, [p, c]) => acc + (p * c), 0);
+    if (total > 0) {
+        totalHistory.push(total);
+        saveData();
+        updateAll();
+        addLog(`セッションを保存しました。合計: ${total.toLocaleString()}円`);
+        alert("データを保存しました！");
+    } else {
+        alert("保存する金額がありません。");
+    }
+};
+
 document.getElementById('reset-button').onclick = () => {
-    if (confirm("リセットしますか？")) {
+    if (confirm("現在のお皿のデータをリセットしますか？")) {
+        const total = Object.entries(plateCounts).reduce((acc, [p, c]) => acc + (p * c), 0);
+        if (total > 0) totalHistory.push(total); 
+        
         plateCounts = {};
         actionHistory = [];
+        saveData();
         updateAll();
+        addLog("データをリセットしました。");
     }
 };
 
 document.getElementById('set-budget-button').onclick = () => {
     const val = prompt("予算設定（円）", budget === Infinity ? "" : budget);
-    if (val !== null) { budget = parseInt(val) || Infinity; updateAll(); }
+    if (val !== null) { 
+        budget = parseInt(val) || Infinity; 
+        updateAll(); 
+        addLog(`予算を ${budget === Infinity ? "未設定" : budget + "円"} に設定しました。`);
+    }
+};
+
+document.getElementById('export-csv-button').onclick = () => {
+    if (Object.keys(plateCounts).length === 0) {
+        alert("出力するデータがありません。");
+        return;
+    }
+    
+    let csvContent = "data:text/csv;charset=utf-8,\uFEFF金額(円),枚数,小計(円)\n"; 
+    let total = 0;
+    
+    for (const [price, count] of Object.entries(plateCounts)) {
+        const subtotal = price * count;
+        total += subtotal;
+        csvContent += `${price},${count},${subtotal}\n`;
+    }
+    csvContent += `合計,,${total}\n`;
+    
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    const dateStr = new Date().toISOString().slice(0,10).replace(/-/g, "");
+    link.setAttribute("download", `sushilog_${dateStr}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    addLog("CSVファイルを出力しました。");
 };

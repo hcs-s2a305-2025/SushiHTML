@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sushi Log v0.19</title>
+    <title>Sushi Log v0.20</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -44,11 +44,17 @@
                     <h3>内訳構成</h3>
                     <div class="chart-wrapper">
                         <canvas id="price-chart"></canvas>
+                        <div id="chart-center-text" class="chart-center">0枚</div>
                     </div>
                 </div>
             </section>
 
             <section class="card input-section">
+                <div class="custom-price-area">
+                    <input type="number" id="custom-price-input" placeholder="新しい金額を追加 (円)">
+                    <button id="add-custom-price-btn" class="btn-outline">種類を追加</button>
+                </div>
+
                 <div class="input-row">
                     <div class="input-group">
                         <label>単価選択</label>
