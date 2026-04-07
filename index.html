@@ -7,8 +7,9 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     
-    <title>Sushi Log v0.21</title>
-    <link rel="stylesheet" href="style.css?v=21">
+    <title>Sushi Log v0.22</title>
+    <link rel="stylesheet" href="style.css?v=22">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
@@ -29,6 +30,7 @@
             <div class="header-actions">
                 <button id="help-button" class="btn-icon">❓</button>
                 <button id="theme-toggle" class="btn-icon">🌓</button>
+                <button id="action-menu-button" class="btn-icon">︙</button>
             </div>
         </header>
 
@@ -80,13 +82,6 @@
                 <button id="add-plate-button" class="btn-primary btn-block">お皿を確定</button>
             </section>
 
-            <section class="action-grid">
-                <button id="set-budget-button" class="btn-outline">予算設定</button>
-                <button id="export-csv-button" class="btn-outline">CSV出力</button>
-                <button id="save-button" class="btn-outline">保存</button>
-                <button id="reset-button" class="btn-danger">リセット</button>
-            </section>
-
             <section class="details">
                 <details>
                     <summary>詳細データ</summary>
@@ -117,22 +112,28 @@
             <div class="help-scroll-area">
                 <h4>1. お店を選ぶ</h4>
                 <p>最初の画面で、行くお店を選んでスタートします。「⚙️ プリセットを編集」から、自分だけのお店の名前や金額を追加することも可能です。</p>
-                
                 <h4>2. お皿を記録する</h4>
-                <p>食べたお皿の金額と枚数を選んで「お皿を確定」ボタンを押します。<br>金額ボタン（+〇〇円）を直接タップすると、1枚ずつ素早く追加できます。</p>
-                
+                <p>金額ボタン（+〇〇円）を直接タップすると素早く追加できます。</p>
                 <h4>3. メニューにない金額の追加</h4>
-                <p>特別メニューなどで一覧にない金額のお皿があった場合は、入力欄に金額を打ち込んで「種類を追加」を押してください。そのセッション中だけ使えるボタンが追加されます。</p>
-                
-                <h4>4. 便利な機能</h4>
-                <p>・<strong>予算設定:</strong> 食べすぎ防止に予算をセットできます。近づくと警告が出ます。<br>
-                ・<strong>1つ取り消す:</strong> 間違えて追加してしまった場合、「詳細データ」の中にある「↩️ 1つ取り消す」ボタンで元に戻せます。<br>
-                ・<strong>保存・リセット:</strong> 食べ終わったら保存して履歴に残すか、リセットして最初からやり直すことができます。</p>
+                <p>入力欄に金額を打ち込んで「種類を追加」を押してください。</p>
+                <h4>4. 管理メニュー（︙）</h4>
+                <p>右上の「︙」から、予算設定、保存、CSV出力、リセットが行えます。</p>
             </div>
             <button id="close-help" class="btn-primary btn-block" style="margin-top:20px;">閉じる</button>
         </div>
     </div>
 
-    <script src="script.js?v=21"></script>
+    <div id="action-menu-modal" class="modal hidden">
+        <div class="modal-content" style="text-align: center;">
+            <h3 style="margin-bottom: 20px;">⚙️ 管理メニュー</h3>
+            <button id="set-budget-button" class="btn-outline btn-block">予算設定</button>
+            <button id="export-csv-button" class="btn-outline btn-block">CSV出力</button>
+            <button id="save-button" class="btn-outline btn-block">保存</button>
+            <button id="reset-button" class="btn-danger btn-block">リセット</button>
+            <button id="close-action-menu" class="btn-primary btn-block" style="margin-top:20px;">閉じる</button>
+        </div>
+    </div>
+
+    <script src="script.js?v=22"></script>
 </body>
 </html>
