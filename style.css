@@ -2,16 +2,17 @@
     1. ベースカラー設定（テーマ変数）
 ========================================= */
 :root {
-    --bg: #f8f9fa;        /* 背景色 */
+    --bg: #f8f9fa;        /* 全体の背景色 */
     --card-bg: #ffffff;   /* 白いカード部分の背景色 */
-    --primary: #d32f2f;   /* メインカラー（動的） */
+    --primary: #d32f2f;   /* メインカラー（お店によって動的に変化） */
     --text: #212121;      /* 基本の文字色 */
     --text-sub: #757575;  /* 薄い文字色 */
     --border: #e0e0e0;    /* 枠線の色 */
-    --guide-bg: #fff9c4;  /* ガイド背景色 */
-    --danger: #ff5252;    /* 危険色 */
+    --guide-bg: #fff9c4;  /* ガイドや注意書きの背景色 */
+    --danger: #ff5252;    /* エラーや削除などの危険色 */
 }
 
+/* ダークモード時の色設定 */
 [data-theme="dark"] {
     --bg: #121212;
     --card-bg: #1e1e1e;
@@ -20,6 +21,7 @@
     --border: #333333;
     --guide-bg: #332d00;
 }
+
 
 /* =========================================
     2. ベーススタイル・スマホ最適化
@@ -30,20 +32,29 @@ body {
     color: var(--text); 
     margin: 0; 
     overflow-x: hidden; 
-    /* ボタン連打中のテキスト選択防止 */
+    
+    /* ボタン連打中に意図せずテキストが選択されて青くなるのを防止 */
     user-select: none; 
     -webkit-user-select: none;
 }
 
-/* 入力欄はテキスト選択を許可 */
+/* 入力欄だけはテキスト選択やコピーを許可する */
 input, textarea, select {
     user-select: auto;
     -webkit-user-select: auto;
 }
 
-.screen { transition: 0.3s; }
-.hidden { display: none !important; }
+/* 画面切り替え時のふわっとしたアニメーション */
+.screen { 
+    transition: 0.3s; 
+}
 
+/* 要素を隠すためのクラス */
+.hidden { 
+    display: none !important; 
+}
+
+/* タイトル画面など、画面全体を覆う設定 */
 .full-height { 
     height: 100vh; 
     display: flex; 
@@ -52,12 +63,14 @@ input, textarea, select {
     align-items: center; 
 }
 
+/* メイン画面の横幅制限と中央寄せ */
 .container { 
     padding: 16px; 
     max-width: 500px; 
     margin: 0 auto; 
 }
 
+/* 白い角丸の箱（UIの基本単位） */
 .card { 
     background: var(--card-bg); 
     border-radius: 16px; 
@@ -67,155 +80,491 @@ input, textarea, select {
     box-shadow: 0 2px 5px rgba(0,0,0,0.02); 
 }
 
+
 /* =========================================
-    3. UIパーツ（タイトル・ボタン類）
+    3. UIパーツ（タイトル・ヘッダー・ボタン）
 ========================================= */
-.hero {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    width: 100%;
+.hero { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    text-align: center; 
+    width: 100%; 
 }
 
-.title-actions { position: absolute; top: 16px; right: 16px; display: flex; gap: 8px; }
-.btn-icon { background: transparent; border: none; font-size: 1.5rem; cursor: pointer; padding: 4px; color: var(--text); }
+.title-actions { 
+    position: absolute; 
+    top: 16px; 
+    right: 16px; 
+    display: flex; 
+    gap: 8px; 
+}
 
-.preset-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; width: 90%; max-width: 400px; margin: 25px auto; }
-.preset-chip { background: var(--card-bg); padding: 20px 15px; border-radius: 12px; border: 1px solid var(--border); cursor: pointer; text-align: left; }
+/* 記号や絵文字だけの透明なボタン */
+.btn-icon { 
+    background: transparent; 
+    border: none; 
+    font-size: 1.5rem; 
+    cursor: pointer; 
+    padding: 4px; 
+    color: var(--text); 
+}
 
+/* お店ボタンを並べるグリッド */
+.preset-grid { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 16px; 
+    width: 90%; 
+    max-width: 400px; 
+    margin: 25px auto; 
+}
+
+.preset-chip { 
+    background: var(--card-bg); 
+    padding: 20px 15px; 
+    border-radius: 12px; 
+    border: 1px solid var(--border); 
+    cursor: pointer; 
+    text-align: left; 
+}
+
+/* メイン画面上部の固定ヘッダー */
 .app-bar { 
-    display: flex; align-items: center; justify-content: space-between; 
-    padding: 8px 16px; background: var(--card-bg); 
-    position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    padding: 8px 16px; 
+    background: var(--card-bg); 
+    position: sticky; 
+    top: 0; 
+    z-index: 100; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
 }
-.header-actions { display: flex; gap: 8px; }
 
-.summary-card { text-align: center; background: var(--primary); color: white; border: none; transition: background 0.3s ease; }
-.price-main { font-size: 3rem; font-weight: bold; }
+.header-actions { 
+    display: flex; 
+    gap: 8px; 
+}
 
-/* スマホのダブルタップズーム無効化で反応速度向上 */
-button, .chip, .preset-chip, .btn-icon, select, input { touch-action: manipulation; }
-button { transition: transform 0.1s ease, background-color 0.2s; font-family: inherit; }
-button:active { transform: scale(0.95); } 
+/* 現在の合計金額を表示する大きなカラーカード */
+.summary-card { 
+    text-align: center; 
+    background: var(--primary); 
+    color: white; 
+    border: none; 
+    transition: background 0.3s ease; 
+}
 
-.btn-primary { background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
-.btn-block { width: 100%; padding: 15px; margin-top: 10px; font-size: 1rem; }
-.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-sub); padding: 10px; border-radius: 10px; font-weight: bold; }
-.btn-danger { color: var(--danger); border: 1px solid var(--danger); background: transparent; padding: 10px; border-radius: 10px; font-weight: bold; }
-.btn-text { background: none; border: none; color: var(--text-sub); margin-top: 20px; text-decoration: underline; cursor: pointer; }
+.price-main { 
+    font-size: 3rem; 
+    font-weight: bold; 
+}
 
-.chip-group { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 15px 0; }
-.chip { padding: 10px 14px; border-radius: 20px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text); font-size: 0.9rem; font-weight: bold; cursor: pointer; }
-.chip:active { background-color: var(--primary); color: white; transform: scale(0.9) translateY(2px); }
+/* スマホ特有の「ダブルタップでズーム」を無効化し、ボタンの反応を速くする */
+button, .chip, .preset-chip, .btn-icon, select, input { 
+    touch-action: manipulation; 
+}
+
+/* ボタンを押したときに少しへこむアニメーション */
+button { 
+    transition: transform 0.1s ease, background-color 0.2s; 
+    font-family: inherit; 
+}
+button:active { 
+    transform: scale(0.95); 
+} 
+
+/* メインの目立つボタン */
+.btn-primary { 
+    background: var(--primary); 
+    color: white; 
+    border: none; 
+    border-radius: 12px; 
+    font-weight: bold; 
+    cursor: pointer; 
+}
+
+/* 横幅いっぱいに広がるボタン */
+.btn-block { 
+    width: 100%; 
+    padding: 15px; 
+    margin-top: 10px; 
+    font-size: 1rem; 
+}
+
+/* 枠線だけの控えめなボタン */
+.btn-outline { 
+    background: transparent; 
+    border: 1px solid var(--border); 
+    color: var(--text-sub); 
+    padding: 10px; 
+    border-radius: 10px; 
+    font-weight: bold; 
+}
+
+/* 警告・リセットなどの危険な操作用ボタン */
+.btn-danger { 
+    color: var(--danger); 
+    border: 1px solid var(--danger); 
+    background: transparent; 
+    padding: 10px; 
+    border-radius: 10px; 
+    font-weight: bold; 
+}
+
+/* 文字だけのリンク風ボタン */
+.btn-text { 
+    background: none; 
+    border: none; 
+    color: var(--text-sub); 
+    margin-top: 20px; 
+    text-decoration: underline; 
+    cursor: pointer; 
+}
+
+/* クイック追加用の小さな角丸ボタン群 */
+.chip-group { 
+    display: flex; 
+    flex-wrap: wrap; 
+    justify-content: center; 
+    gap: 8px; 
+    margin: 15px 0; 
+}
+
+.chip { 
+    padding: 10px 14px; 
+    border-radius: 20px; 
+    border: 1px solid var(--border); 
+    background: var(--card-bg); 
+    color: var(--text); 
+    font-size: 0.9rem; 
+    font-weight: bold; 
+    cursor: pointer; 
+}
+
+.chip:active { 
+    background-color: var(--primary); 
+    color: white; 
+    transform: scale(0.9) translateY(2px); 
+}
+
 
 /* =========================================
     4. 視覚化エリア（お皿タワー・円グラフ）
 ========================================= */
-.visual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.v-card { height: 210px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.visual-grid { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 12px; 
+}
 
+.v-card { 
+    height: 210px; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+}
+
+/* お皿が積み上がる領域の枠組み */
 #sushi-tower { 
-    display: flex; flex-direction: column; width: 80px; height: 140px; 
-    overflow-y: auto; overflow-x: hidden; border-bottom: 3px solid var(--border); 
-    padding-right: 15px; padding-bottom: 5px; scroll-behavior: smooth; 
+    display: flex; 
+    flex-direction: column; 
+    width: 80px; 
+    height: 140px; 
+    overflow-y: auto; 
+    overflow-x: hidden; 
+    border-bottom: 3px solid var(--border); 
+    padding-right: 15px; 
+    padding-bottom: 5px; 
+    scroll-behavior: smooth; 
 }
 
+/* お皿1枚ごとの見た目（CSSで立体感を作っています） */
 .plate-visual { 
-    width: 50px; height: 12px; border-radius: 50% / 50%; margin-bottom: -5px;      
+    width: 50px; 
+    height: 12px; 
+    border-radius: 50% / 50%; 
+    margin-bottom: -5px;      
     box-shadow: 0 2px 3px rgba(0,0,0,0.2), inset 0 -2px 3px rgba(0,0,0,0.1); 
-    border: 1px solid rgba(255,255,255,0.4); flex-shrink: 0; position: relative;
+    border: 1px solid rgba(255,255,255,0.4); 
+    flex-shrink: 0; 
+    position: relative;
 }
 
-.tower-marker { width: 40px; height: 0; border-bottom: 2px dashed var(--text-sub); margin: 3px 0; position: relative; flex-shrink: 0; z-index: 10; }
-.tower-marker span { position: absolute; right: -30px; top: -10px; font-size: 0.75rem; color: var(--text-sub); font-weight: bold; }
-
-/* 追加時の落下アニメーション */
-@keyframes dropIn {
-    0% { transform: translateY(-40px) scale(1.1); opacity: 0; } 
-    100% { transform: translateY(0) scale(1); opacity: 1; }
+/* 10枚ごとに横に出る破線と数字 */
+.tower-marker { 
+    width: 40px; 
+    height: 0; 
+    border-bottom: 2px dashed var(--text-sub); 
+    margin: 3px 0; 
+    position: relative; 
+    flex-shrink: 0; 
+    z-index: 10; 
 }
-.drop-in { animation: dropIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
-.chart-wrapper { height: 120px; width: 120px; position: relative; display: flex; align-items: center; justify-content: center; }
-.chart-center { position: absolute; font-weight: bold; font-size: 1.2rem; pointer-events: none; color: var(--text); }
+.tower-marker span { 
+    position: absolute; 
+    right: -30px; 
+    top: -10px; 
+    font-size: 0.75rem; 
+    color: var(--text-sub); 
+    font-weight: bold; 
+}
+
+/* お皿が上から落ちてくるアニメーション */
+@keyframes dropIn { 
+    0% { 
+        transform: translateY(-40px) scale(1.1); 
+        opacity: 0; 
+    } 
+    100% { 
+        transform: translateY(0) scale(1); 
+        opacity: 1; 
+    } 
+}
+.drop-in { 
+    animation: dropIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
+}
+
+.chart-wrapper { 
+    height: 120px; 
+    width: 120px; 
+    position: relative; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+}
+
+.chart-center { 
+    position: absolute; 
+    font-weight: bold; 
+    font-size: 1.2rem; 
+    pointer-events: none; 
+    color: var(--text); 
+}
+
 
 /* =========================================
-    5. 入力・お会計計算エリア
+    5. 入力・お会計計算エリア共通スタイル
 ========================================= */
-.input-row { display: flex; gap: 10px; align-items: center; }
-.input-group label { display: block; font-size: 0.85rem; color: var(--text-sub); margin-bottom: 4px; }
-.custom-price-area { display: flex; gap: 8px; margin-bottom: 15px; }
+.input-row { 
+    display: flex; 
+    gap: 10px; 
+    align-items: center; 
+}
 
+.input-group label { 
+    display: block; 
+    font-size: 0.85rem; 
+    color: var(--text-sub); 
+    margin-bottom: 4px; 
+}
+
+.custom-price-area { 
+    display: flex; 
+    gap: 8px; 
+    margin-bottom: 15px; 
+}
+
+/* テキストボックスやプルダウンの共通デザイン */
 .styled-input, .styled-select { 
-    flex: 1; padding: 10px; border-radius: 8px; border: 1px solid var(--border); 
-    background: var(--bg); color: var(--text); font-family: inherit; font-size: 1rem; 
-    width: 100%; box-sizing: border-box;
+    flex: 1; 
+    padding: 10px; 
+    border-radius: 8px; 
+    border: 1px solid var(--border); 
+    background: var(--bg); 
+    color: var(--text); 
+    font-family: inherit; 
+    font-size: 1rem; 
+    width: 100%; 
+    box-sizing: border-box;
 }
-.styled-select { height: 43px; cursor: pointer; } 
 
-.stepper-large { display: flex; align-items: center; gap: 10px; }
-.stepper-large input { width: 50px; text-align: center; font-size: 1.2rem; border: none; background: transparent; color: var(--text); font-family: inherit; font-weight: bold; }
+.styled-select { 
+    height: 43px; 
+    cursor: pointer; 
+} 
 
-/* 割合(%)入力用の小さな枠 */
-.rate-input {
-    width: 50px; padding: 4px; border: 1px solid var(--border); border-radius: 6px; 
-    text-align: center; background: var(--card-bg); color: var(--text); 
-    font-weight: bold; margin: 0 5px;
+/* ＋－ボタンと数字が並ぶ入力パーツ */
+.stepper-large { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
 }
+
+.stepper-large input { 
+    width: 50px; 
+    text-align: center; 
+    font-size: 1.2rem; 
+    border: none; 
+    background: transparent; 
+    color: var(--text); 
+    font-family: inherit; 
+    font-weight: bold; 
+}
+
 
 /* =========================================
     6. 詳細データ・履歴・モーダル
 ========================================= */
-.details-section { margin-top: 10px; }
-.details-card { padding: 16px; margin-bottom: 12px; }
-.details-card summary { font-weight: bold; cursor: pointer; outline: none; margin-bottom: 10px; list-style-position: inside; }
-.details-content { margin-top: 10px; }
-.info-box { background: var(--bg); padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border); font-size: 0.9rem; }
+.details-section { 
+    margin-top: 10px; 
+}
 
+.details-card { 
+    padding: 16px; 
+    margin-bottom: 12px; 
+}
+
+.details-card summary { 
+    font-weight: bold; 
+    cursor: pointer; 
+    outline: none; 
+    margin-bottom: 10px; 
+    list-style-position: inside; 
+}
+
+.details-content { 
+    margin-top: 10px; 
+}
+
+.info-box { 
+    background: var(--bg); 
+    padding: 12px; 
+    border-radius: 8px; 
+    margin-bottom: 10px; 
+    border: 1px solid var(--border); 
+    font-size: 0.9rem; 
+}
+
+/* モーダルの背景（黒い半透明） */
 .modal { 
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-    background: rgba(0,0,0,0.6); display: flex; justify-content: center; 
-    align-items: center; z-index: 2000; backdrop-filter: blur(3px); 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: rgba(0,0,0,0.6); 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    z-index: 2000; 
+    backdrop-filter: blur(3px); 
 }
+
+/* モーダルの本体（白い箱） */
 .modal-content { 
-    background: var(--bg); width: 90%; max-width: 400px; padding: 20px; 
-    border-radius: 20px; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
+    background: var(--bg); 
+    width: 90%; 
+    max-width: 400px; 
+    padding: 20px; 
+    border-radius: 20px; 
+    max-height: 85vh; 
+    overflow-y: auto; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
 }
 
-.settings-item { margin-bottom: 10px; }
-.settings-item input[type="text"] { width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); font-family: inherit; }
-.btn-danger-small { background: none; border: 1px solid var(--danger); color: var(--danger); padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; }
+/* 設定画面のリスト用 */
+.settings-item { 
+    margin-bottom: 10px; 
+}
 
-.help-scroll-area { max-height: 50vh; overflow-y: auto; text-align: left; padding: 10px 0; }
-.help-scroll-area h4 { margin: 15px 0 5px 0; color: var(--primary); border-bottom: 1px solid var(--border); padding-bottom: 3px; }
-.help-scroll-area p { margin: 0; font-size: 0.9rem; line-height: 1.5; color: var(--text-sub); }
+.settings-item input[type="text"] { 
+    width: 100%; 
+    padding: 8px; 
+    border: 1px solid var(--border); 
+    border-radius: 8px; 
+    background: var(--bg); 
+    color: var(--text); 
+    font-family: inherit; 
+}
+
+.btn-danger-small { 
+    background: none; 
+    border: 1px solid var(--danger); 
+    color: var(--danger); 
+    padding: 4px 8px; 
+    border-radius: 6px; 
+    font-size: 0.8rem; 
+    cursor: pointer; 
+}
+
+/* ヘルプ画面のスクロール領域 */
+.help-scroll-area { 
+    max-height: 50vh; 
+    overflow-y: auto; 
+    text-align: left; 
+    padding: 10px 0; 
+}
+
+.help-scroll-area h4 { 
+    margin: 15px 0 5px 0; 
+    color: var(--primary); 
+    border-bottom: 1px solid var(--border); 
+    padding-bottom: 3px; 
+}
+
+.help-scroll-area p { 
+    margin: 0; 
+    font-size: 0.9rem; 
+    line-height: 1.5; 
+    color: var(--text-sub); 
+}
+
 
 /* =========================================
     7. UI/UX 用アニメーション設定
 ========================================= */
-/* 通知トースト用 */
-.toast-msg {
-    position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8); color: white; padding: 12px 24px;
-    border-radius: 25px; z-index: 9999; font-size: 0.95rem; font-weight: bold;
-    pointer-events: none; animation: slideUpToast 0.3s ease forwards;
-}
-.toast-msg.fade-out { animation: fadeOutToast 0.3s ease forwards; }
 
-@keyframes slideUpToast {
-    from { bottom: 0; opacity: 0; } to { bottom: 30px; opacity: 1; }
+/* 通知トースト（画面下から出るメッセージ） */
+.toast-msg {
+    position: fixed; 
+    bottom: 30px; 
+    left: 50%; 
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8); 
+    color: white; 
+    padding: 12px 24px;
+    border-radius: 25px; 
+    z-index: 9999; 
+    font-size: 0.95rem; 
+    font-weight: bold;
+    pointer-events: none; 
+    animation: slideUpToast 0.3s ease forwards;
 }
-@keyframes fadeOutToast {
-    from { opacity: 1; } to { opacity: 0; visibility: hidden; }
+
+.toast-msg.fade-out { 
+    animation: fadeOutToast 0.3s ease forwards; 
+}
+
+@keyframes slideUpToast { 
+    from { bottom: 0; opacity: 0; } 
+    to { bottom: 30px; opacity: 1; } 
+}
+
+@keyframes fadeOutToast { 
+    from { opacity: 1; } 
+    to { opacity: 0; visibility: hidden; } 
 }
 
 /* お皿を削除した時に弾け飛ぶアニメーション */
 @keyframes popOut {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.2) translateY(-10px); opacity: 0.8; }
-    100% { transform: scale(0) translateY(-20px); opacity: 0; }
+    0% { 
+        transform: scale(1); 
+        opacity: 1; 
+    }
+    50% { 
+        transform: scale(1.2) translateY(-10px); 
+        opacity: 0.8; 
+    }
+    100% { 
+        transform: scale(0) translateY(-20px); 
+        opacity: 0; 
+    }
 }
-.pop-out {
-    animation: popOut 0.2s ease forwards !important;
+
+.pop-out { 
+    animation: popOut 0.2s ease forwards !important; 
 }
