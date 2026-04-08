@@ -1,5 +1,5 @@
 // キャッシュ名（バージョンを上げるとキャッシュが更新されます）
-const CACHE_NAME = 'sushi-log-v1';
+const CACHE_NAME = 'sushi-log-v42b';
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
