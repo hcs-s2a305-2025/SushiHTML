@@ -9,7 +9,7 @@
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121212">    
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍣</text></svg>">
     
-    <title>Sushi Log v0.42c</title>
+    <title>Sushi Log v0.43</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -18,10 +18,10 @@
     <script src="script.js" defer></script>
 </head>
 <body>
-    <div id="title-screen" class="screen full-height" style="position: relative;">
+    <div id="title-screen" class="screen full-height title-screen-wrap">
         <div class="title-actions">
             <button id="title-about-button" class="btn-icon">i</button>
-            <button id="title-help-button" class="btn-icon">？</button>
+            <button id="title-help-button" class="btn-icon">?</button>
             <button id="title-theme-toggle" class="btn-icon">🌓</button>
         </div>
         <div class="hero">
@@ -37,7 +37,7 @@
             <button id="back-to-title" class="btn-icon">←</button>
             <h2 id="current-shop-name">Sushi Log</h2>
             <div class="header-actions">
-                <button id="help-button" class="btn-icon">？</button>
+                <button id="help-button" class="btn-icon">?</button>
                 <button id="theme-toggle" class="btn-icon">🌓</button>
                 <button id="action-menu-button" class="btn-icon">︙</button>
             </div>
@@ -74,7 +74,7 @@
                 </div>
 
                 <div class="input-row">
-                    <div class="input-group" style="flex: 1;">
+                    <div class="input-group flex-1">
                         <label>単価選択</label>
                         <select id="price-select" class="styled-select"></select>
                     </div>
@@ -108,7 +108,7 @@
                 </details>
             </section>
 
-            <button id="open-checkout-modal" class="btn-primary btn-block" style="margin-top: 20px; font-size: 1.2rem; padding: 15px; background-color: #f39c12;">
+            <button id="open-checkout-modal" class="btn-primary btn-block btn-checkout mt-20">
                 お会計に進む
             </button>
         </main>
@@ -116,47 +116,47 @@
 
     <div id="checkout-modal" class="modal hidden">
         <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h3 style="margin: 0;">お会計計算</h3>
+            <div class="modal-header">
+                <h3>お会計計算</h3>
                 <button id="close-checkout-modal" class="btn-icon">×</button>
             </div>
             
-            <p style="text-align: center; font-size: 1.1rem; margin-bottom: 20px;">
+            <p class="checkout-subtitle">
                 <strong>お皿の合計:</strong> <span id="checkout-plates-total">0</span>円
             </p>
 
-            <div class="input-row" style="margin-bottom: 15px;">
-                <div class="input-group" style="flex: 1;">
+            <div class="input-row mb-15">
+                <div class="input-group flex-1">
                     <label>深夜・サ料 (%)</label>
-                    <div style="display: flex; gap: 8px; align-items: center;">
-                        <input type="number" id="rate-late-night" value="10" min="0" class="styled-input" style="padding: 10px; text-align: center;">
-                        <input type="checkbox" id="checkout-late-night" style="transform: scale(1.4); accent-color: var(--primary);">
+                    <div class="input-flex-row">
+                        <input type="number" id="rate-late-night" value="7" min="0" class="styled-input input-calc">
+                        <input type="checkbox" id="checkout-late-night" class="checkbox-large">
                     </div>
                 </div>
-                <div class="input-group" style="flex: 1;">
+                <div class="input-group flex-1">
                     <label>外税計算 (%)</label>
-                    <div style="display: flex; gap: 8px; align-items: center;">
-                        <input type="number" id="rate-tax" value="10" min="0" class="styled-input" style="padding: 10px; text-align: center;">
-                        <input type="checkbox" id="checkout-tax" style="transform: scale(1.4); accent-color: var(--primary);">
+                    <div class="input-flex-row">
+                        <input type="number" id="rate-tax" value="10" min="0" class="styled-input input-calc">
+                        <input type="checkbox" id="checkout-tax" class="checkbox-large">
                     </div>
                 </div>
             </div>
 
-            <div class="input-group" style="margin-bottom: 15px;">
+            <div class="input-group mb-15">
                 <label>割引クーポン (円引き)</label>
-                <div class="custom-price-area" style="margin-bottom: 0;">
+                <div class="custom-price-area mb-0">
                     <input type="number" id="checkout-discount" value="0" min="0" step="10" class="styled-input">
-                    <button id="clear-discount-btn" class="btn-outline" style="white-space: nowrap;">クリア</button>
+                    <button id="clear-discount-btn" class="btn-outline btn-clear">クリア</button>
                 </div>
             </div>
 
-            <hr style="border: 0; border-top: 1px dashed var(--border); margin: 15px 0;">
+            <hr class="dashed-hr">
 
-            <div style="text-align: center; font-size: 1.5rem; margin-bottom: 15px;">
-                <strong>最終合計: <span id="checkout-final-total" style="color: var(--primary);">0</span>円</strong>
+            <div class="checkout-final">
+                <strong>最終合計: <span id="checkout-final-total" class="text-primary">0</span>円</strong>
             </div>
 
-            <div class="input-group" style="margin-bottom: 15px; display: flex; flex-direction: column; align-items: center;">
+            <div class="input-group split-group">
                 <label>👥 割り勘人数</label>
                 <div class="stepper-large">
                     <button id="split-minus">−</button>
@@ -165,17 +165,17 @@
                 </div>
             </div>
 
-            <div style="background: var(--guide-bg); padding: 15px; border-radius: 8px; text-align: center;">
-                <p style="margin: 0; font-size: 1.2rem;">1人あたり: <strong><span id="checkout-per-person">0</span>円</strong></p>
-                <p style="margin: 5px 0 0; color: var(--danger); font-weight: bold;">あまり: <span id="checkout-remainder">0</span>円</p>
+            <div class="checkout-result-box">
+                <p>1人あたり: <strong><span id="checkout-per-person">0</span>円</strong></p>
+                <p>あまり: <span id="checkout-remainder">0</span>円</p>
             </div>
         </div>
     </div>
 
     <div id="custom-confirm-modal" class="modal hidden">
-        <div class="modal-content" style="text-align: center; max-width: 300px;">
-            <h3 id="custom-confirm-msg" style="margin-bottom: 20px;"></h3>
-            <div style="display: flex; gap: 10px;">
+        <div class="modal-content modal-sm">
+            <h3 id="custom-confirm-msg" class="mb-20"></h3>
+            <div class="btn-group-row">
                 <button id="custom-confirm-cancel" class="btn-outline btn-block">キャンセル</button>
                 <button id="custom-confirm-ok" class="btn-primary btn-block">OK</button>
             </div>
@@ -183,10 +183,10 @@
     </div>
     
     <div id="custom-prompt-modal" class="modal hidden">
-        <div class="modal-content" style="text-align: center; max-width: 300px;">
-            <h3 id="custom-prompt-msg" style="margin-bottom: 15px;"></h3>
-            <input type="number" id="custom-prompt-input" class="styled-input" style="margin-bottom: 15px;">
-            <div style="display: flex; gap: 10px;">
+        <div class="modal-content modal-sm">
+            <h3 id="custom-prompt-msg" class="mb-15"></h3>
+            <input type="number" id="custom-prompt-input" class="styled-input mb-15">
+            <div class="btn-group-row">
                 <button id="custom-prompt-cancel" class="btn-outline btn-block">キャンセル</button>
                 <button id="custom-prompt-ok" class="btn-primary btn-block">設定</button>
             </div>
@@ -198,7 +198,7 @@
             <h3>店舗プリセット設定</h3>
             <div id="settings-list"></div>
             <button id="add-new-preset" class="btn-outline btn-block">+ 新しいお店を追加</button>
-            <button id="close-settings" class="btn-primary btn-block" style="margin-top:20px;">保存して閉じる</button>
+            <button id="close-settings" class="btn-primary btn-block mt-20">保存して閉じる</button>
         </div>
     </div>
 
@@ -207,7 +207,7 @@
             <h3>🍣 使い方ガイド</h3>
             <div class="help-scroll-area">
                 <h4>1. お店を選ぶ</h4>
-                <p>最初の画面で、行くお店を選んでスタートします。「⚙️ プリセットを編集」からお店の名前や金額を追加可能です。</p>
+                <p>最初の画面で、行くお店を選んでスタートします。「プリセットを編集」からお店の名前や金額を追加可能です。</p>
                 
                 <h4>2. お皿を記録する</h4>
                 <p>金額ボタン（+〇〇円）を直接タップすると素早く追加できます。</p>
@@ -221,34 +221,34 @@
                 <h4>5. 管理メニュー（︙）</h4>
                 <p>右上の「︙」から、予算設定、履歴の保存、CSV出力、リセットが行えます。</p>
             </div>
-            <button id="close-help" class="btn-primary btn-block" style="margin-top:20px;">閉じる</button>
+            <button id="close-help" class="btn-primary btn-block mt-20">閉じる</button>
         </div>
     </div>
 
     <div id="action-menu-modal" class="modal hidden">
-        <div class="modal-content" style="text-align: center;">
-            <h3 style="margin-bottom: 20px;">管理メニュー</h3>
+        <div class="modal-content text-center">
+            <h3 class="mb-20">管理メニュー</h3>
             <button id="set-budget-button" class="btn-outline btn-block">予算設定</button>
             <button id="export-csv-button" class="btn-outline btn-block">CSV出力</button>
             <button id="save-button" class="btn-outline btn-block">セッションを保存</button>
             <button id="reset-button" class="btn-danger btn-block">データをリセット</button>
-            <button id="close-action-menu" class="btn-primary btn-block" style="margin-top:20px;">閉じる</button>
+            <button id="close-action-menu" class="btn-primary btn-block mt-20">閉じる</button>
         </div>
     </div>
 
     <div id="about-modal" class="modal hidden">
-        <div class="modal-content" style="text-align: center;">
-            <h3 style="margin-bottom: 15px;">🍣 Sushi Log v0.42c</h3>
-            <p style="font-size: 0.9rem; color: var(--text-sub); line-height: 1.6; text-align: left;">
+        <div class="modal-content text-center">
+            <h3 class="mb-15">🍣 Sushi Log v0.43</h3>
+            <p class="about-text">
                 お寿司屋さんでの食事を楽しく、賢く記録するためのアプリです。<br>
                 完全オフラインで動作し、データはすべてお使いの端末内にのみ保存されます。<br><br>
                 スマホの共有メニューから「ホーム画面に追加」を行うことで、専用アプリのように快適にご利用いただけます。
             </p>
-            <p style="font-size: 0.9rem; color: var(--text-sub); line-height: 1.6; text-align: left;">
-                v0.42cの変更点：キャッシュ関係のアップデートを行いました。
+            <p class="about-text">
+                v0.43の変更点：軽微なバグの修正
             </p>
-            <p style="margin-top: 15px; font-weight: bold;">製作者：I.H.</p>
-            <button id="close-about" class="btn-primary btn-block" style="margin-top:20px;">閉じる</button>
+            <p class="about-author">製作者：I.H.</p>
+            <button id="close-about" class="btn-primary btn-block mt-20">閉じる</button>
         </div>
     </div>
 </body>

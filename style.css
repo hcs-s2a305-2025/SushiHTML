@@ -568,3 +568,56 @@ button:active {
 .pop-out { 
     animation: popOut 0.2s ease forwards !important; 
 }
+
+/* =========================================
+    8. ユーティリティ・レイアウト専用クラス
+========================================= */
+
+/* 余白調整用 */
+.mt-20 { margin-top: 20px; }
+.mb-20 { margin-bottom: 20px; }
+.mb-15 { margin-bottom: 15px; }
+.mb-0  { margin-bottom: 0; }
+
+/* Flexboxレイアウト補助 */
+.flex-1 { flex: 1; }
+.input-flex-row { display: flex; gap: 8px; align-items: center; }
+.btn-group-row { display: flex; gap: 10px; }
+
+/* テキスト・カラー補助 */
+.text-center { text-align: center; }
+.text-primary { color: var(--primary); }
+
+/* お会計に進むボタン専用 */
+.btn-checkout {
+    font-size: 1.2rem; 
+    padding: 15px; 
+    background-color: #f39c12; /* 目立つオレンジ色 */
+}
+.btn-checkout:active {
+    background-color: #e67e22; /* 押した時に少し暗くする */
+}
+
+/* モーダル内の細かいパーツ */
+.title-screen-wrap { position: relative; }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.modal-header h3 { margin: 0; }
+.checkout-subtitle { text-align: center; font-size: 1.1rem; margin-bottom: 20px; }
+.input-calc { padding: 10px; text-align: center; }
+.checkbox-large { transform: scale(1.4); accent-color: var(--primary); }
+.btn-clear { white-space: nowrap; }
+.dashed-hr { border: 0; border-top: 1px dashed var(--border); margin: 15px 0; }
+.checkout-final { text-align: center; font-size: 1.5rem; margin-bottom: 15px; }
+
+/* 割り勘・計算結果エリア */
+.split-group { display: flex; flex-direction: column; align-items: center; margin-bottom: 15px; }
+.checkout-result-box { background: var(--guide-bg); padding: 15px; border-radius: 8px; text-align: center; }
+.checkout-result-box p:first-child { margin: 0; font-size: 1.2rem; }
+.checkout-result-box p:last-child { margin: 5px 0 0; color: var(--danger); font-weight: bold; }
+
+/* 小さめのモーダル (確認ダイアログ等) */
+.modal-content.modal-sm { max-width: 300px; text-align: center; }
+
+/* アプリ概要(About)テキスト */
+.about-text { font-size: 0.9rem; color: var(--text-sub); line-height: 1.6; text-align: left; }
+.about-author { margin-top: 15px; font-weight: bold; }
