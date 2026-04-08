@@ -1,6 +1,7 @@
 // ★重要：アプリを更新した時は、この v1 を v2, v3... と数字を上げていきます。
 // これによりブラウザが「あ、新しいバージョンが出たな」と気づきます。
-const CACHE_NAME = 'sushi-log-v43'; 
+//バージョン改変後修正忘れず
+const CACHE_NAME = 'sushi-log-v44'; 
 
 const urlsToCache = [
     './',

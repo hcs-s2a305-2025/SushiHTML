@@ -9,7 +9,8 @@
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#121212">    
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍣</text></svg>">
     
-    <title>Sushi Log v0.43</title>
+    <!-- バージョン改変後修正忘れず -->
+    <title>Sushi Log v0.44</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -18,6 +19,7 @@
     <script src="script.js" defer></script>
 </head>
 <body>
+    <!-- タイトル画面 -->
     <div id="title-screen" class="screen full-height title-screen-wrap">
         <div class="title-actions">
             <button id="title-about-button" class="btn-icon">i</button>
@@ -28,36 +30,47 @@
             <h1>🍣 Sushi Log</h1>
             <p>お店を選んでスタート</p>
             <div id="preset-selector" class="preset-grid"></div>
+            <!-- プリセット編集ボタン -->
             <button id="open-settings" class="btn-text">プリセットを編集</button>
         </div>
     </div>
 
+    <!-- メイン画面部分 -->
     <div id="main-screen" class="screen hidden">
+        <!-- ヘッダー -->
         <header id="app-bar" class="app-bar">
             <button id="back-to-title" class="btn-icon">←</button>
             <h2 id="current-shop-name">Sushi Log</h2>
             <div class="header-actions">
+                <!-- 使い方ガイドボタン -->
                 <button id="help-button" class="btn-icon">?</button>
+                <!-- ダークモード切り替えボタン（環境依存） -->
                 <button id="theme-toggle" class="btn-icon">🌓</button>
+                <!-- メニューモーダルボタン -->
                 <button id="action-menu-button" class="btn-icon">︙</button>
             </div>
         </header>
 
+        <!-- メイン -->
         <main class="container">
-            <div id="budget-guide" class="guide-box"></div>
 
+            <!-- 合計金額表示部 -->
             <section class="card summary-card">
                 <div class="price-main">
                     <span id="total-display">0</span><small>円</small>
                 </div>
                 <div id="budget-display" class="budget-sub">予算: 未設定</div>
+                <div id="budget-guide" class="guide-box"></div>
             </section>
 
+            <!-- 2段目 -->
             <section class="visual-grid">
+                <!-- お皿タワー -->
                 <div class="card v-card">
                     <h3>お皿タワー</h3>
                     <div id="sushi-tower"></div>
                 </div>
+                <!-- 内訳 -->
                 <div class="card v-card">
                     <h3>内訳構成</h3>
                     <div class="chart-wrapper">
@@ -67,30 +80,41 @@
                 </div>
             </section>
 
+            <!-- 情報入力部 -->
             <section class="card input-section">
+                <!-- 新規金額追加 -->
                 <div class="custom-price-area">
                     <input type="number" id="custom-price-input" placeholder="新しい金額を追加 (円)" class="styled-input" min="10">
                     <button id="add-custom-price-btn" class="btn-outline">種類を追加</button>
                 </div>
 
+                <!-- 任意の金額の枚数をまとめて追加 -->
                 <div class="input-row">
+                    <!-- 単価選択 -->
                     <div class="input-group flex-1">
                         <label>単価選択</label>
                         <select id="price-select" class="styled-select"></select>
                     </div>
+                    <!-- 枚数選択 -->
                     <div class="input-group">
                         <label>枚数</label>
                         <div class="stepper-large">
                             <button id="count-minus">−</button>
-                            <input type="number" id="plate-count" value="1" readonly>
+                            <input type="number" id="plate-count" value="0" readonly>
                             <button id="count-plus">+</button>
                         </div>
                     </div>
                 </div>
-                <div id="quick-add-buttons" class="chip-group"></div>
+                <br>
+                <!-- 枚数選択したお皿を追加するボタン -->
                 <button id="add-plate-button" class="btn-primary btn-block">お皿を確定</button>
+                <br>
+                <!-- クイック追加ボタン -->
+                <p>クイック追加ボタン</p>
+                <div id="quick-add-buttons" class="chip-group"></div>
             </section>
 
+            <!-- 詳細データ -->
             <section class="details-section">
                 <details class="card details-card">
                     <summary>詳細データ</summary>
@@ -99,6 +123,7 @@
                         <div id="stats-area" class="info-box"></div>
                     </div>
                 </details>
+                <!-- 履歴・ログ -->
                 <details class="card details-card">
                     <summary>履歴・ログ</summary>
                     <div class="details-content">
@@ -108,12 +133,16 @@
                 </details>
             </section>
 
+            <!-- お会計に進むボタン -->
             <button id="open-checkout-modal" class="btn-primary btn-block btn-checkout mt-20">
                 お会計に進む
             </button>
         </main>
     </div>
+    <!-- /メイン画面部分 -->
 
+    <!-- モーダルと愉快な仲間たち -->
+    <!-- お会計モーダル -->
     <div id="checkout-modal" class="modal hidden">
         <div class="modal-content">
             <div class="modal-header">
@@ -125,7 +154,9 @@
                 <strong>お皿の合計:</strong> <span id="checkout-plates-total">0</span>円
             </p>
 
+            <!-- 任意計算 -->
             <div class="input-row mb-15">
+                <!-- 深夜料金 -->
                 <div class="input-group flex-1">
                     <label>深夜・サ料 (%)</label>
                     <div class="input-flex-row">
@@ -133,8 +164,9 @@
                         <input type="checkbox" id="checkout-late-night" class="checkbox-large">
                     </div>
                 </div>
+                <!-- 税金計算 -->
                 <div class="input-group flex-1">
-                    <label>外税計算 (%)</label>
+                    <label>税金計算 (%)</label>
                     <div class="input-flex-row">
                         <input type="number" id="rate-tax" value="10" min="0" class="styled-input input-calc">
                         <input type="checkbox" id="checkout-tax" class="checkbox-large">
@@ -142,6 +174,7 @@
                 </div>
             </div>
 
+            <!-- クーポンあったらそんなピンポイントの値段なんかわからんから勝手に入れろ -->
             <div class="input-group mb-15">
                 <label>割引クーポン (円引き)</label>
                 <div class="custom-price-area mb-0">
@@ -150,12 +183,15 @@
                 </div>
             </div>
 
+            <!-- いけないボーダーライン -->
             <hr class="dashed-hr">
 
+            <!-- 計算後の合計金額 -->
             <div class="checkout-final">
                 <strong>最終合計: <span id="checkout-final-total" class="text-primary">0</span>円</strong>
             </div>
 
+            <!-- 割り勘計算 -->
             <div class="input-group split-group">
                 <label>👥 割り勘人数</label>
                 <div class="stepper-large">
@@ -165,6 +201,7 @@
                 </div>
             </div>
 
+            <!-- 割り勘結果 あまりは自分たちでどうにかしてくれや -->
             <div class="checkout-result-box">
                 <p>1人あたり: <strong><span id="checkout-per-person">0</span>円</strong></p>
                 <p>あまり: <span id="checkout-remainder">0</span>円</p>
@@ -172,7 +209,8 @@
         </div>
     </div>
 
-    <div id="custom-confirm-modal" class="modal hidden">
+    <!-- お前誰？ -->
+    <!-- <div id="custom-confirm-modal" class="modal hidden">
         <div class="modal-content modal-sm">
             <h3 id="custom-confirm-msg" class="mb-20"></h3>
             <div class="btn-group-row">
@@ -180,9 +218,10 @@
                 <button id="custom-confirm-ok" class="btn-primary btn-block">OK</button>
             </div>
         </div>
-    </div>
+    </div> -->
     
-    <div id="custom-prompt-modal" class="modal hidden">
+    <!-- お前も誰だ？ -->
+    <!-- <div id="custom-prompt-modal" class="modal hidden">
         <div class="modal-content modal-sm">
             <h3 id="custom-prompt-msg" class="mb-15"></h3>
             <input type="number" id="custom-prompt-input" class="styled-input mb-15">
@@ -191,8 +230,9 @@
                 <button id="custom-prompt-ok" class="btn-primary btn-block">設定</button>
             </div>
         </div>
-    </div>
+    </div> -->
 
+    <!-- お店プリセットの編集、追加、削除 -->
     <div id="settings-modal" class="modal hidden">
         <div class="modal-content">
             <h3>店舗プリセット設定</h3>
@@ -202,6 +242,7 @@
         </div>
     </div>
 
+    <!-- 使い方ガイド -->
     <div id="help-modal" class="modal hidden">
         <div class="modal-content">
             <h3>🍣 使い方ガイド</h3>
@@ -225,9 +266,10 @@
         </div>
     </div>
 
+    <!-- メニュー画面 -->
     <div id="action-menu-modal" class="modal hidden">
         <div class="modal-content text-center">
-            <h3 class="mb-20">管理メニュー</h3>
+            <h3 class="mb-20">メニュー</h3>
             <button id="set-budget-button" class="btn-outline btn-block">予算設定</button>
             <button id="export-csv-button" class="btn-outline btn-block">CSV出力</button>
             <button id="save-button" class="btn-outline btn-block">セッションを保存</button>
@@ -236,16 +278,19 @@
         </div>
     </div>
 
+    <!-- このアプリについて -->
     <div id="about-modal" class="modal hidden">
         <div class="modal-content text-center">
-            <h3 class="mb-15">🍣 Sushi Log v0.43</h3>
+            <!-- バージョン改変後修正忘れず -->
+            <h3 class="mb-15">🍣 Sushi Log v0.44</h3>
             <p class="about-text">
                 お寿司屋さんでの食事を楽しく、賢く記録するためのアプリです。<br>
                 完全オフラインで動作し、データはすべてお使いの端末内にのみ保存されます。<br><br>
                 スマホの共有メニューから「ホーム画面に追加」を行うことで、専用アプリのように快適にご利用いただけます。
             </p>
+            <!-- バージョン改変後修正忘れず -->
             <p class="about-text">
-                v0.43の変更点：軽微なバグの修正
+                v0.44の変更点：画面UIの修正
             </p>
             <p class="about-author">製作者：I.H.</p>
             <button id="close-about" class="btn-primary btn-block mt-20">閉じる</button>
