@@ -7,10 +7,19 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     
-    <title>Sushi Log v0.32</title>
-    <link rel="stylesheet" href="style.css?v=32">
+    <title>Sushi Log v4.0</title>
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // 現在の時刻（ミリ秒）を取得し、URLの末尾に付けることで常に新しいファイルとしてブラウザに認識させる
+        const timestamp = new Date().getTime();
+        
+        // CSSの動的読み込み
+        document.write(`<link rel="stylesheet" href="style.css?v=${timestamp}">`);
+        // JavaScriptの動的読み込み（deferを付けてHTML読み込み後に実行させる）
+        document.write(`<script src="script.js?v=${timestamp}" defer><\/script>`);
+    </script>
 </head>
 <body>
     <div id="title-screen" class="screen full-height" style="position: relative;">
@@ -65,7 +74,7 @@
 
             <section class="card input-section">
                 <div class="custom-price-area">
-                    <input type="number" id="custom-price-input" placeholder="新しい金額を追加 (円)" class="styled-input">
+                    <input type="number" id="custom-price-input" placeholder="新しい金額を追加 (円)" class="styled-input" min="10">
                     <button id="add-custom-price-btn" class="btn-outline">種類を追加</button>
                 </div>
 
@@ -104,32 +113,9 @@
                 </details>
             </section>
 
-            <section class="card checkout-card">
-                <h3>💰 お会計計算</h3>
-                <div class="checkout-grid">
-                    <div class="input-group">
-                        <label>割引</label>
-                        <div style="display:flex; gap:5px;">
-                            <input type="number" id="discount-val" placeholder="0" class="styled-input" style="width: 60%;" min="0">
-                            <select id="discount-type" class="styled-select" style="width: 40%; padding: 5px;">
-                                <option value="yen">円引</option>
-                                <option value="percent">％引</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <label>割り勘</label>
-                        <div style="display:flex; align-items:center; gap:5px;">
-                            <input type="number" id="split-count" value="1" min="1" class="styled-input" style="width: 80%;">
-                            <span>人</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="checkout-result">
-                    <div>割引後合計: <strong id="discounted-total">0</strong> 円</div>
-                    <div class="split-result">1人あたり: <strong id="per-person-amount" class="highlight-text">0</strong> 円</div>
-                </div>
-            </section>
+            <button id="open-checkout-modal" class="btn-primary btn-block" style="margin-top: 20px; font-size: 1.2rem; padding: 15px; background-color: #f39c12;">
+                💰 お会計に進む
+            </button>
         </main>
     </div>
 
@@ -176,7 +162,6 @@
         <div class="modal-content" style="text-align: center;">
             <h3 style="margin-bottom: 15px;">🍣 Sushi Log</h3>
             <p style="font-size: 0.9rem; color: var(--text-sub); line-height: 1.6; text-align: left;">
-                <strong>バージョン:</strong> 0.32<br><br>
                 お寿司屋さんでの食事を楽しく、賢く記録するためのアプリです。<br>
                 完全オフラインで動作し、データはすべてお使いの端末内にのみ保存されます。<br><br>
                 スマホの「ホーム画面に追加」を行うことで、アプリのように快適にご利用いただけます。
@@ -186,6 +171,46 @@
         </div>
     </div>
 
-    <script src="script.js?v=29"></script>
+    <div id="checkout-modal" class="modal hidden">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="margin: 0;">🧾 お会計計算</h3>
+                <button id="close-checkout-modal" class="btn-icon">✖️</button>
+            </div>
+            
+            <p style="text-align: center; font-size: 1.1rem;"><strong>お皿の合計:</strong> <span id="checkout-plates-total">0</span>円</p>
+
+            <div style="background: var(--bg); padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--border);">
+                <label style="display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center;">
+                    🌙 深夜料金 (10%加算) <input type="checkbox" id="checkout-late-night" style="transform: scale(1.3); accent-color: var(--primary);">
+                </label>
+                <label style="display: flex; justify-content: space-between; align-items: center;">
+                    🧾 外税計算 (10%加算) <input type="checkbox" id="checkout-tax" style="transform: scale(1.3); accent-color: var(--primary);">
+                </label>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-size: 0.9rem; margin-bottom: 5px;">🎫 割引クーポン (円引き)</label>
+                <input type="number" id="checkout-discount" value="0" min="0" step="10" class="input-field" style="width: 100%; box-sizing: border-box;">
+            </div>
+
+            <hr style="border: 0; border-top: 1px dashed var(--border); margin: 15px 0;">
+
+            <div style="text-align: center; font-size: 1.5rem; margin-bottom: 15px;">
+                <strong>最終合計: <span id="checkout-final-total" style="color: var(--primary);">0</span>円</strong>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-size: 0.9rem; margin-bottom: 5px;">👥 割り勘人数</label>
+                <input type="number" id="checkout-split" value="1" min="1" class="input-field" style="width: 100%; box-sizing: border-box; text-align: center;">
+            </div>
+
+            <div style="background: var(--guide-bg); padding: 15px; border-radius: 8px; text-align: center;">
+                <p style="margin: 0; font-size: 1.2rem;">1人あたり: <strong><span id="checkout-per-person">0</span>円</strong></p>
+                <p style="margin: 5px 0 0; color: var(--danger); font-weight: bold;">あまり: <span id="checkout-remainder">0</span>円</p>
+                <p style="margin: 0; font-size: 0.8rem; color: var(--text-sub);">(端数は誰かが多めに出してね！)</p>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
