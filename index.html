@@ -10,7 +10,7 @@
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍣</text></svg>">
     
     <!-- バージョン改変後修正忘れず -->
-    <title>Sushi Log v0.44</title>
+    <title>Sushi Log v0.45</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -22,8 +22,11 @@
     <!-- タイトル画面 -->
     <div id="title-screen" class="screen full-height title-screen-wrap">
         <div class="title-actions">
+            <!-- このアプリについてボタン -->
             <button id="title-about-button" class="btn-icon">i</button>
+            <!-- 使い方ガイドボタン -->
             <button id="title-help-button" class="btn-icon">?</button>
+            <!-- ダークモード切り替えボタン（環境依存） -->
             <button id="title-theme-toggle" class="btn-icon">🌓</button>
         </div>
         <div class="hero">
@@ -261,6 +264,12 @@
                 
                 <h4>5. 管理メニュー（︙）</h4>
                 <p>右上の「︙」から、予算設定、履歴の保存、CSV出力、リセットが行えます。</p>
+
+                <h4>注意</h4>
+                <p>・一度セッションやアプリを閉じるとデータが消失します。</p>
+                <p>・このアプリは試験運用のため、アプリのバグによる現実での影響や被害は保証致しかねます。</p>
+                <p>・また、本アプリは学内でのテスト運用が前提のため、一般の方への公開を想定しておりません。ご了承ください</p>
+            <br>
             </div>
             <button id="close-help" class="btn-primary btn-block mt-20">閉じる</button>
         </div>
@@ -282,17 +291,23 @@
     <div id="about-modal" class="modal hidden">
         <div class="modal-content text-center">
             <!-- バージョン改変後修正忘れず -->
-            <h3 class="mb-15">🍣 Sushi Log v0.44</h3>
+            <h3 class="mb-15">🍣 Sushi Log v0.45</h3>
             <p class="about-text">
                 お寿司屋さんでの食事を楽しく、賢く記録するためのアプリです。<br>
                 完全オフラインで動作し、データはすべてお使いの端末内にのみ保存されます。<br><br>
                 スマホの共有メニューから「ホーム画面に追加」を行うことで、専用アプリのように快適にご利用いただけます。
             </p>
+            <h4 class="about-text">注意</h4>
+            <p class="about-text">・一度セッションやアプリを閉じるとデータが消失します。</p>
+            <p class="about-text">・このアプリは試験運用のため、アプリのバグによる現実での影響や被害は保証致しかねます。</p>
+            <p class="about-text">・また、本アプリは学内でのテスト運用が前提のため、一般の方への公開を想定しておりません。ご了承ください</p>
+            <br>
             <!-- バージョン改変後修正忘れず -->
             <p class="about-text">
-                v0.44の変更点：画面UIの修正
+                v0.45の変更点：画面UIの修正
             </p>
             <p class="about-author">製作者：I.H.</p>
+            <p>デバッグは直接本人まで</p>
             <button id="close-about" class="btn-primary btn-block mt-20">閉じる</button>
         </div>
     </div>
