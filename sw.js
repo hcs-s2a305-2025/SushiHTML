@@ -1,17 +1,51 @@
-// キャッシュ名（バージョンを上げるとキャッシュが更新されます）
-const CACHE_NAME = 'sushi-log-v42b';
+// ★重要：アプリを更新した時は、この v1 を v2, v3... と数字を上げていきます。
+// これによりブラウザが「あ、新しいバージョンが出たな」と気づきます。
+const CACHE_NAME = 'sushi-log-v42c'; 
 
+const urlsToCache = [
+    './',
+    './index.html',
+    './style.css',
+    './script.js',
+    './manifest.json'
+];
+
+// インストール処理（キャッシュへの保存）
 self.addEventListener('install', (event) => {
+    // 新しいバージョンが見つかったら、すぐに待機状態をスキップしてインストールする
+    self.skipWaiting();
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(['./', './index.html', './style.css', './script.js']);
+            return cache.addAll(urlsToCache);
         })
     );
 });
 
-// オフライン時はキャッシュを返し、オンライン時は常に最新を取得する（Network First戦略）
+// アクティベート処理（古いキャッシュの削除）
+self.addEventListener('activate', (event) => {
+    event.waitUntil(
+        caches.keys().then((cacheNames) => {
+            return Promise.all(
+                cacheNames.map((cacheName) => {
+                    // 現在のバージョン（sushi-log-v2）以外の古いキャッシュを見つけたら削除する
+                    if (cacheName !== CACHE_NAME) {
+                        return caches.delete(cacheName);
+                    }
+                })
+            );
+        })
+    );
+    // 新しいService Workerをすぐにページ全体に反映させる
+    self.clients.claim();
+});
+
+// フェッチ処理（ネットワーク通信の制御）
 self.addEventListener('fetch', (event) => {
     event.respondWith(
-        fetch(event.request).catch(() => caches.match(event.request))
+        // まずはインターネット（ネットワーク）から最新のファイルを取ろうと試みる
+        fetch(event.request).catch(() => {
+            // オフラインなどで通信に失敗したら、キャッシュからファイルを返す
+            return caches.match(event.request);
+        })
     );
 });
