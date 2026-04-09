@@ -102,7 +102,7 @@ input, textarea, select {
 
 /* 記号や絵文字だけの透明なボタン */
 .btn-icon { 
-    width: 60px;
+    width: 40px;
     height: auto;
     background: transparent; 
     border: none; 
