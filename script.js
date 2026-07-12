@@ -309,7 +309,7 @@ function initChart() {
             labels: [], 
             datasets: [{ 
                 data: [], 
-                backgroundColor: ['#ff5252', '#448aff', '#4caf50', '#ffeb3b', '#9c27b0'] 
+                backgroundColor: ['#ff5252', '#448aff', '#4caf50', '#ffeb3b', '#9c27b0', '#c300c0'] 
             }] 
         },
         options: { 
@@ -335,7 +335,7 @@ function updateChart() {
 function updateTexts(total) {
     const summaryArea = document.getElementById('summary-area');
     const undoBtnHtml = actionHistory.length > 0 
-        ? `<button onclick="undoLastAction()" class="btn-outline" style="width:100%; margin-bottom:10px;">↩️ 1つ取り消す</button>` 
+        ? `` 
         : '';
         
     summaryArea.innerHTML = undoBtnHtml + Object.entries(plateCounts)
@@ -461,7 +461,8 @@ function applyPlateChange(price, count) {
     updateAll();
     
     // 入力欄を1に戻す
-    document.getElementById('plate-count').value = 1; 
+    // 使ってない
+    // document.getElementById('plate-count').value = 1; 
 }
 
 // 操作の取り消し（Undo）
@@ -607,19 +608,6 @@ document.getElementById('back-to-title').onclick = () => {
     }
 };
 
-// ダークモードの切り替え
-const toggleTheme = () => {
-    const isDark = document.body.hasAttribute('data-theme');
-    if (isDark) {
-        document.body.removeAttribute('data-theme');
-    } else {
-        document.body.setAttribute('data-theme', 'dark');
-    }
-    localStorage.setItem('theme', isDark ? 'light' : 'dark');
-};
-document.getElementById('theme-toggle').onclick = toggleTheme; 
-document.getElementById('title-theme-toggle').onclick = toggleTheme;
-
 // 管理メニュー：保存
 document.getElementById('save-button').onclick = () => {
     document.getElementById('close-action-menu').click();
@@ -632,7 +620,7 @@ document.getElementById('save-button').onclick = () => {
         saveData(); 
         updateAll();
         addLog(`セッションを保存しました。`); 
-        showToast("✅ データを保存しました");
+        showToast("データを保存しました");
     } else { 
         showToast("⚠️ 保存するデータがありません"); 
     }
@@ -650,7 +638,7 @@ document.getElementById('reset-button').onclick = () => {
         saveData(); 
         updateAll(); 
         addLog("データをリセットしました。"); 
-        showToast("♻️ データをリセットしました");
+        showToast("データをリセットしました");
     });
 };
 
@@ -662,7 +650,7 @@ document.getElementById('set-budget-button').onclick = () => {
         budget = parseInt(val) || Infinity; 
         updateAll(); 
         addLog(`予算を ${budget === Infinity ? "未設定" : budget + "円"} に設定しました。`); 
-        showToast("💰 予算を設定しました");
+        showToast("予算を設定しました");
     });
 };
 
@@ -699,7 +687,7 @@ document.getElementById('export-csv-button').onclick = () => {
 
 
 // ==========================================
-// 8. お会計モーダル（デザイン統一版）
+// 8. お会計モーダル
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
     const checkoutModal = document.getElementById('checkout-modal');

@@ -10,7 +10,7 @@
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍣</text></svg>">
     
     <!-- バージョン改変後修正忘れず -->
-    <title>Sushi Log v0.48</title>
+    <title>Sushi Log v0.50</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -26,8 +26,6 @@
             <button id="title-about-button" class="btn-icon">i</button>
             <!-- 使い方ガイドボタン -->
             <button id="title-help-button" class="btn-icon">?</button>
-            <!-- ダークモード切り替えボタン（環境依存） -->
-            <button id="title-theme-toggle" class="btn-icon">🌓</button>
         </div>
         <div class="hero">
             <h1>🍣 Sushi Log</h1>
@@ -47,8 +45,6 @@
             <div class="header-actions">
                 <!-- 使い方ガイドボタン -->
                 <button id="help-button" class="btn-icon">?</button>
-                <!-- ダークモード切り替えボタン（環境依存） -->
-                <button id="theme-toggle" class="btn-icon">🌓</button>
                 <!-- メニューモーダルボタン -->
                 <button id="action-menu-button" class="btn-icon">︙</button>
             </div>
@@ -116,6 +112,7 @@
                 <!-- クイック追加ボタン -->
                 <p>クイック追加ボタン</p>
                 <div id="quick-add-buttons" class="chip-group"></div>
+                <button onclick="undoLastAction()" class="btn-outline" style="width:100%; margin-bottom:10px;">↩️ 1つ取り消す</button>
             </section>
 
             <!-- 詳細データ -->
@@ -224,7 +221,7 @@
         </div>
     </div>
     
-    <!-- お前も誰だ？ -->
+    <!-- 予算設定 -->
     <div id="custom-prompt-modal" class="modal hidden">
         <div class="modal-content modal-sm">
             <h3 id="custom-prompt-msg" class="mb-15"></h3>
@@ -292,7 +289,7 @@
     <div id="about-modal" class="modal hidden">
         <div class="modal-content text-center">
             <!-- バージョン改変後修正忘れず -->
-            <h3 class="mb-15">🍣 Sushi Log v0.49</h3>
+            <h3 class="mb-15">🍣 Sushi Log v0.50</h3>
             <p class="about-text">
                 お寿司屋さんで食べた金額ごとのお皿の量を記録できるアプリです。<br>
                 アプリ起動後は完全オフラインで動作します。<br><br>
@@ -303,7 +300,7 @@
             <p class="about-text">・また、本アプリは学内でのテスト運用が前提のため、一般の方への公開を想定しておりません。ご了承ください</p>
             <!-- バージョン改変後修正忘れず -->
             <p class="about-text">
-                v0.49の変更点：不具合の修正
+                v0.50の変更点：機能修正
             </p>
             <p class="about-author">製作者：I.H.</p>
             <button id="close-about" class="btn-primary btn-block mt-20">閉じる</button>
