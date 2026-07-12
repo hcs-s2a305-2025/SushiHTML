@@ -351,6 +351,9 @@ function updateTexts(total) {
         if (total > budget) { 
             guide.innerText = "予算オーバーです！"; 
             guide.style.color = "var(--danger)"; 
+        } else if(total == budget){
+            guide.innerText = "設定予算です。"; 
+            guide.style.color = "var(--danger)"; 
         } else if (total > budget * 0.9) { 
             guide.innerText = "まもなく予算到達です！"; 
             guide.style.color = "orange"; 

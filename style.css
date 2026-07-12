@@ -12,16 +12,6 @@
     --danger: #ff5252;    /* エラーや削除などの危険色 */
 }
 
-/* ダークモード時の色設定 */
-[data-theme="dark"] {
-    --bg: #121212;
-    --card-bg: #1e1e1e;
-    --text: #e0e0e0;
-    --text-sub: #b0b0b0;
-    --border: #333333;
-    --guide-bg: #332d00;
-}
-
 
 /* =========================================
     2. ベーススタイル・スマホ最適化
@@ -288,7 +278,7 @@ button:active {
     scroll-behavior: smooth; 
 }
 
-/* お皿1枚ごとの見た目（CSSで立体感を作っています） */
+/* お皿1枚ごとの見た目 */
 .plate-visual { 
     width: 50px; 
     height: 12px; 
