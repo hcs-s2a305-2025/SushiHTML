@@ -91,27 +91,28 @@
                     <button id="add-custom-price-btn" class="btn-outline">種類を追加</button>
                 </div>
 
+                <!-- クイック設定作ったからこれいらんよな -->
                 <!-- 任意の金額の枚数をまとめて追加 -->
-                <div class="input-row">
+                <!-- <div class="input-row"> -->
                     <!-- 単価選択 -->
-                    <div class="input-group flex-1">
+                    <!-- <div class="input-group flex-1">
                         <label>単価選択</label>
                         <select id="price-select" class="styled-select"></select>
-                    </div>
+                    </div> -->
                     <!-- 枚数選択 -->
-                    <div class="input-group">
+                    <!-- <div class="input-group">
                         <label>枚数</label>
                         <div class="stepper-large">
                             <button id="count-minus">−</button>
                             <input type="number" id="plate-count" value="0" readonly>
                             <button id="count-plus">+</button>
                         </div>
-                    </div>
-                </div>
-                <br>
+                    </div> -->
+                <!-- </div> -->
+                <!-- <br> -->
                 <!-- 枚数選択したお皿を追加するボタン -->
-                <button id="add-plate-button" class="btn-primary btn-block">お皿を確定</button>
-                <br>
+                <!-- <button id="add-plate-button" class="btn-primary btn-block">お皿を確定</button> -->
+                <!-- <br> -->
                 <!-- クイック追加ボタン -->
                 <p>クイック追加ボタン</p>
                 <div id="quick-add-buttons" class="chip-group"></div>
@@ -213,7 +214,7 @@
     </div>
 
     <!-- お前誰？ -->
-    <!-- <div id="custom-confirm-modal" class="modal hidden">
+    <div id="custom-confirm-modal" class="modal hidden">
         <div class="modal-content modal-sm">
             <h3 id="custom-confirm-msg" class="mb-20"></h3>
             <div class="btn-group-row">
@@ -221,10 +222,10 @@
                 <button id="custom-confirm-ok" class="btn-primary btn-block">OK</button>
             </div>
         </div>
-    </div> -->
+    </div>
     
     <!-- お前も誰だ？ -->
-    <!-- <div id="custom-prompt-modal" class="modal hidden">
+    <div id="custom-prompt-modal" class="modal hidden">
         <div class="modal-content modal-sm">
             <h3 id="custom-prompt-msg" class="mb-15"></h3>
             <input type="number" id="custom-prompt-input" class="styled-input mb-15">
@@ -233,7 +234,7 @@
                 <button id="custom-prompt-ok" class="btn-primary btn-block">設定</button>
             </div>
         </div>
-    </div> -->
+    </div>
 
     <!-- お店プリセットの編集、追加、削除 -->
     <div id="settings-modal" class="modal hidden">
@@ -254,9 +255,9 @@
                 <p>最初の画面で、行くお店を選んでスタートします。「プリセットを編集」からお店の名前や金額を追加可能です。</p>
                 
                 <h4>2. お皿を記録する</h4>
-                <p>金額ボタン（+〇〇円）を直接タップすると素早く追加できます。</p>
+                <p>クイック追加ボタンをタップすると素早く追加できます。</p>
                 
-                <h4>3. メニューにない金額の追加</h4>
+                <h4>3. クイック追加ボタンにない金額の追加</h4>
                 <p>入力欄に金額を打ち込んで「種類を追加」を押してください。</p>
                 
                 <h4>4. お会計と税率設定</h4>
@@ -291,10 +292,10 @@
     <div id="about-modal" class="modal hidden">
         <div class="modal-content text-center">
             <!-- バージョン改変後修正忘れず -->
-            <h3 class="mb-15">🍣 Sushi Log v0.48</h3>
+            <h3 class="mb-15">🍣 Sushi Log v0.49</h3>
             <p class="about-text">
-                お寿司屋さんでの食事を楽しく、賢く記録するためのアプリです。<br>
-                完全オフラインで動作し、データはすべてお使いの端末内にのみ保存されます。<br><br>
+                お寿司屋さんで食べた金額ごとのお皿の量を記録できるアプリです。<br>
+                アプリ起動後は完全オフラインで動作します。<br><br>
                 スマホの共有メニューから「ホーム画面に追加」を行うことで、専用アプリのように快適にご利用いただけます。
             </p>
             <h4 class="about-text">注意</h4>
@@ -302,7 +303,7 @@
             <p class="about-text">・また、本アプリは学内でのテスト運用が前提のため、一般の方への公開を想定しておりません。ご了承ください</p>
             <!-- バージョン改変後修正忘れず -->
             <p class="about-text">
-                v0.48の変更点：画面UIの修正
+                v0.49の変更点：不具合の修正
             </p>
             <p class="about-author">製作者：I.H.</p>
             <button id="close-about" class="btn-primary btn-block mt-20">閉じる</button>
