@@ -34,11 +34,6 @@ window.onload = () => {
     loadData();             
     renderPresetChips();    
     initChart();            
-    
-    // ダークモード設定の復元
-    if (localStorage.getItem('theme') === 'dark') {
-        document.body.setAttribute('data-theme', 'dark');
-    }
 
     // PWA: Service Workerの登録
     if ('serviceWorker' in navigator) {
@@ -99,7 +94,7 @@ async function requestWakeLock() {
 
 
 // ==========================================
-// 3. カスタムUI（ポップアップの代わり）
+// 3. カスタムUI
 // ==========================================
 
 // 画面下からフワッと出る通知メッセージ
@@ -309,7 +304,7 @@ function initChart() {
             labels: [], 
             datasets: [{ 
                 data: [], 
-                backgroundColor: ['#ff5252', '#448aff', '#4caf50', '#ffeb3b', '#9c27b0', '#c300c0'] 
+                backgroundColor: ['#ff0000', '#448aff', '#4caf50', '#ffeb3b', '#9c27b0', '#ffac11', '#ff7474', '#a3c4fd', '#99de9b', '#fff7b4', '#ff6cfd', '#ffd993'] 
             }] 
         },
         options: { 
