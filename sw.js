@@ -1,5 +1,5 @@
 // ★重要：アプリを更新した時は、vXXの部分を修正する。
-const CACHE_NAME = 'sushi-log-v59'; 
+const CACHE_NAME = 'sushi-log-v60'; 
 
 const urlsToCache = [
     './',
