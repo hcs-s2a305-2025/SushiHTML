@@ -793,11 +793,42 @@ document.addEventListener("DOMContentLoaded", () => {
 // ==========================================
 // 9. データ更新時のUIフロー制御
 // ==========================================
-function triggerUpdateFlow(newWorker) {
-    // 1. ポップアップで確認（既存の showConfirm を活用）
-    showConfirm("最新データがあります。更新しますか？", () => {
+
+// ==========================================
+// 強制確認用モーダル（「はい」のみ表示）
+// ==========================================
+function showForceAlert(msg, onOk) {
+    document.getElementById('custom-confirm-msg').innerText = msg;
+    
+    const modal = document.getElementById('custom-confirm-modal');
+    const cancelBtn = document.getElementById('custom-confirm-cancel');
+    const okBtn = document.getElementById('custom-confirm-ok');
+    
+    // キャンセルボタンを非表示にし、OKボタンの文字を「はい」にする
+    cancelBtn.style.display = 'none';
+    okBtn.innerText = 'はい';
+    
+    modal.classList.remove('hidden');
+    
+    okBtn.onclick = () => { 
+        modal.classList.add('hidden'); 
         
-        // 2. 「はい」が押下されたら画面を切り替え
+        // 通常の showConfirm を使った時のために、ボタンの状態を元に戻しておく
+        cancelBtn.style.display = ''; 
+        okBtn.innerText = 'OK'; 
+        
+        onOk(); 
+    };
+}
+
+// ==========================================
+// データ更新時のUIフロー制御
+// ==========================================
+function triggerUpdateFlow(newWorker) {
+    // 先ほど作った強制モーダルを使用する（文言も断定系に変更）
+    showForceAlert("最新データが見つかりました。更新を実行します。", () => {
+        
+        // 画面を更新用ローディング画面に切り替え
         document.getElementById('title-screen').classList.add('hidden');
         const updateScreen = document.getElementById('update-screen');
         updateScreen.classList.remove('hidden');
@@ -812,39 +843,35 @@ function triggerUpdateFlow(newWorker) {
         progressBar.style.width = "0%";
         tapPrompt.classList.add('hidden');
 
-        // プログレスバーのアニメーション開始 (DOMの反映を確実にするため少し遅延)
+        // プログレスバーのアニメーション開始
         setTimeout(() => {
             progressBar.style.width = "100%";
         }, 50);
 
-        // 3. 完了処理（CSSのtransitionに合わせた1.2秒後に発火）
+        // 完了処理（CSSのtransitionに合わせた1.2秒後に発火）
         setTimeout(() => {
             updateText.innerText = "データ更新完了";
             tapPrompt.classList.remove('hidden');
-            triggerVibrate(50); // オプション：完了時に軽く振動させる
+            triggerVibrate(50); // 完了時の振動
 
-            // 4. 画面タップまたはキー押下のイベント
+            // 画面タップまたはキー押下のイベント
             const finishUpdate = () => {
-                // UIをタイトル画面に戻す
                 updateScreen.classList.add('hidden');
                 document.getElementById('title-screen').classList.remove('hidden');
                 
-                // イベントリスナーのお掃除
                 document.removeEventListener('click', finishUpdate);
                 document.removeEventListener('keydown', finishUpdate);
                 
-                // 【プロからの補足】
-                // UIの見た目はタイトルに戻りますが、裏側のJavaScript等を即座に最新にする場合、
-                // ここで newWorker.postMessage({ type: 'SKIP_WAITING' }); のあとに
-                // location.reload(); を実行するのがPWAの一般的な挙動です。
+                // ※ もしここでブラウザのキャッシュを完全にクリアして再読み込みさせたい場合は、
+                // location.reload(); をこの行に追加すると確実です。
             };
 
-            // アニメーション完了直後の誤タップを防ぐため、0.3秒ほど待ってから操作を受け付ける
+            // アニメーション完了直後の誤タップ防止
             setTimeout(() => {
                 document.addEventListener('click', finishUpdate);
                 document.addEventListener('keydown', finishUpdate);
             }, 300);
 
-        }, 1200); // 1.2秒待機
+        }, 1200); 
     });
 }
