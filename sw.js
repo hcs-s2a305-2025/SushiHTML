@@ -2,7 +2,7 @@
 // バージョンを変えないと、ブラウザで変更を検知してくれません。
 
 //バージョン改変後修正忘れず
-const CACHE_NAME = 'sushi-log-v53'; 
+const CACHE_NAME = 'sushi-log-v54'; 
 
 const urlsToCache = [
     './',
