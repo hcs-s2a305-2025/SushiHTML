@@ -826,7 +826,7 @@ function showForceAlert(msg, onOk) {
 // ==========================================
 function triggerUpdateFlow(newWorker) {
     // 先ほど作った強制モーダルを使用する（文言も断定系に変更）
-    showForceAlert("最新データが見つかりました。更新を実行します。", () => {
+    showForceAlert("最新データが見つかりました。\n更新を実行します。", () => {
         
         // 画面を更新用ローディング画面に切り替え
         document.getElementById('title-screen').classList.add('hidden');
@@ -862,8 +862,8 @@ function triggerUpdateFlow(newWorker) {
                 document.removeEventListener('click', finishUpdate);
                 document.removeEventListener('keydown', finishUpdate);
                 
-                // ※ もしここでブラウザのキャッシュを完全にクリアして再読み込みさせたい場合は、
-                // location.reload(); をこの行に追加すると確実です。
+                //強制的にリロードさせるやつ
+                // location.reload();
             };
 
             // アニメーション完了直後の誤タップ防止
