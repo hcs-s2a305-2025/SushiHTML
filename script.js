@@ -856,16 +856,14 @@ function triggerUpdateFlow(newWorker) {
 
             // 画面タップまたはキー押下のイベント
             const finishUpdate = () => {
-                updateScreen.classList.add('hidden');
-                document.getElementById('title-screen').classList.remove('hidden');
-                
+                // イベントリスナーのお掃除（これは念のため残しておいてOKです）
                 document.removeEventListener('click', finishUpdate);
                 document.removeEventListener('keydown', finishUpdate);
                 
-                //強制的にリロードさせるやつ
+                // 強制的にページを再読み込みして最新データを反映させる！
                 location.reload();
             };
-
+            
             // アニメーション完了直後の誤タップ防止
             setTimeout(() => {
                 document.addEventListener('click', finishUpdate);
