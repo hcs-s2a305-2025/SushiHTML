@@ -1,8 +1,8 @@
-// ★重要：アプリを更新した時は、vOOの部分を修正する。
+// ★重要：アプリを更新した時は、vXXの部分を修正する。
 // バージョンを変えないと、ブラウザで変更を検知してくれません。
 
 //バージョン改変後修正忘れず
-const CACHE_NAME = 'sushi-log-v52'; 
+const CACHE_NAME = 'sushi-log-v53'; 
 
 const urlsToCache = [
     './',
@@ -29,7 +29,7 @@ self.addEventListener('activate', (event) => {
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
-                    // 現在のバージョン（sushi-log-v2）以外の古いキャッシュを見つけたら削除する
+                    // 現在のバージョン以外の古いキャッシュを見つけたら削除する
                     if (cacheName !== CACHE_NAME) {
                         return caches.delete(cacheName);
                     }

@@ -35,12 +35,22 @@ window.onload = () => {
     renderPresetChips();    
     initChart();            
 
-    // PWA: Service Workerの登録
+    // PWA: Service Workerの登録と更新検知（ここを修正）
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW登録失敗:', err));
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+            reg.addEventListener('updatefound', () => {
+                const newWorker = reg.installing;
+                newWorker.addEventListener('statechange', () => {
+                    // 新しいSWがインストール済 ＆ 既に現在のページを制御するSWがいる（＝2回目以降のアクセス＝更新）場合
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        triggerUpdateFlow(newWorker);
+                    }
+                });
+            });
+        }).catch(err => console.log('SW登録失敗:', err));
     }
 
-    // 全ての数値入力欄で、タップ時に自動で全選択する（入力しやすくする）
+    // 全ての数値入力欄で、タップ時に自動で全選択する
     document.querySelectorAll('input[type="number"]').forEach(input => {
         input.addEventListener('focus', function() {
             this.select();
@@ -779,3 +789,62 @@ document.addEventListener("DOMContentLoaded", () => {
         triggerVibrate(20);
     });
 });
+
+// ==========================================
+// 9. データ更新時のUIフロー制御
+// ==========================================
+function triggerUpdateFlow(newWorker) {
+    // 1. ポップアップで確認（既存の showConfirm を活用）
+    showConfirm("最新データがあります。更新しますか？", () => {
+        
+        // 2. 「はい」が押下されたら画面を切り替え
+        document.getElementById('title-screen').classList.add('hidden');
+        const updateScreen = document.getElementById('update-screen');
+        updateScreen.classList.remove('hidden');
+
+        // 各要素の取得
+        const updateText = document.getElementById('update-text');
+        const progressBar = document.getElementById('update-progress-bar');
+        const tapPrompt = document.getElementById('update-tap-prompt');
+
+        // 初期状態のリセット
+        updateText.innerText = "データ更新中...";
+        progressBar.style.width = "0%";
+        tapPrompt.classList.add('hidden');
+
+        // プログレスバーのアニメーション開始 (DOMの反映を確実にするため少し遅延)
+        setTimeout(() => {
+            progressBar.style.width = "100%";
+        }, 50);
+
+        // 3. 完了処理（CSSのtransitionに合わせた1.2秒後に発火）
+        setTimeout(() => {
+            updateText.innerText = "データ更新完了";
+            tapPrompt.classList.remove('hidden');
+            triggerVibrate(50); // オプション：完了時に軽く振動させる
+
+            // 4. 画面タップまたはキー押下のイベント
+            const finishUpdate = () => {
+                // UIをタイトル画面に戻す
+                updateScreen.classList.add('hidden');
+                document.getElementById('title-screen').classList.remove('hidden');
+                
+                // イベントリスナーのお掃除
+                document.removeEventListener('click', finishUpdate);
+                document.removeEventListener('keydown', finishUpdate);
+                
+                // 【プロからの補足】
+                // UIの見た目はタイトルに戻りますが、裏側のJavaScript等を即座に最新にする場合、
+                // ここで newWorker.postMessage({ type: 'SKIP_WAITING' }); のあとに
+                // location.reload(); を実行するのがPWAの一般的な挙動です。
+            };
+
+            // アニメーション完了直後の誤タップを防ぐため、0.3秒ほど待ってから操作を受け付ける
+            setTimeout(() => {
+                document.addEventListener('click', finishUpdate);
+                document.addEventListener('keydown', finishUpdate);
+            }, 300);
+
+        }, 1200); // 1.2秒待機
+    });
+}

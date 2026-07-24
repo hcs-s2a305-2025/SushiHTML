@@ -676,3 +676,38 @@ button:active {
     margin-top: 15px; 
     font-weight: bold; 
 }
+
+/* =========================================
+    9. データ更新画面用スタイル
+========================================= */
+.progress-bar-container {
+    width: 80%;
+    max-width: 300px;
+    height: 12px;
+    background-color: var(--border);
+    border-radius: 10px;
+    margin: 20px auto;
+    overflow: hidden;
+}
+
+/* プログレスバーの中身（1.2秒かけて右に伸びるアニメーション） */
+.progress-bar-fill {
+    width: 0%;
+    height: 100%;
+    background-color: var(--primary);
+    transition: width 1.2s ease-in-out; 
+}
+
+/* タップを促す点滅テキスト */
+.blinking-text {
+    animation: blink 1.2s infinite;
+    cursor: pointer;
+    font-weight: bold;
+    color: var(--primary);
+    margin-top: 15px;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
