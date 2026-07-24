@@ -30,24 +30,34 @@ const towerContainer = document.getElementById('sushi-tower');
 // ==========================================
 // 2. 初期化・ユーティリティ関数
 // ==========================================
+let refreshing = false; // 重複リロード防止フラグ
+
 window.onload = () => {
     loadData();             
     renderPresetChips();    
     initChart();            
 
-    // PWA: Service Workerの登録と更新検知（ここを修正）
+    // PWA: Service Workerの登録と更新検知
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js').then(reg => {
             reg.addEventListener('updatefound', () => {
                 const newWorker = reg.installing;
                 newWorker.addEventListener('statechange', () => {
-                    // 新しいSWがインストール済 ＆ 既に現在のページを制御するSWがいる（＝2回目以降のアクセス＝更新）場合
                     if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                         triggerUpdateFlow(newWorker);
                     }
                 });
             });
         }).catch(err => console.log('SW登録失敗:', err));
+
+        // ＝＝＝ここから追加＝＝＝
+        // 新しいService Workerが主導権を握った瞬間にページをリロードする
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!refreshing) {
+                refreshing = true;
+                window.location.reload();
+            }
+        });
     }
 
     // 全ての数値入力欄で、タップ時に自動で全選択する
@@ -856,14 +866,15 @@ function triggerUpdateFlow(newWorker) {
 
             // 画面タップまたはキー押下のイベント
             const finishUpdate = () => {
-                // イベントリスナーのお掃除（これは念のため残しておいてOKです）
+                // イベントリスナーのお掃除
                 document.removeEventListener('click', finishUpdate);
                 document.removeEventListener('keydown', finishUpdate);
                 
-                // 強制的にページを再読み込みして最新データを反映させる！
-                location.reload();
+                // 修正：直接リロードするのではなく、新しいSWに「待機をスキップせよ」と指示を出す。
+                // すると controllerchange イベントが発火し、確実に最新状態でリロードされる
+                newWorker.postMessage({ type: 'SKIP_WAITING' });
             };
-            
+
             // アニメーション完了直後の誤タップ防止
             setTimeout(() => {
                 document.addEventListener('click', finishUpdate);

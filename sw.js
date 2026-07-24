@@ -1,8 +1,5 @@
 // ★重要：アプリを更新した時は、vXXの部分を修正する。
-// バージョンを変えないと、ブラウザで変更を検知してくれません。
-
-//バージョン改変後修正忘れず
-const CACHE_NAME = 'sushi-log-v58'; 
+const CACHE_NAME = 'sushi-log-v59'; 
 
 const urlsToCache = [
     './',
@@ -12,10 +9,9 @@ const urlsToCache = [
     './manifest.json'
 ];
 
-// インストール処理（キャッシュへの保存）
+// 1. インストール処理
 self.addEventListener('install', (event) => {
-    // 新しいバージョンが見つかったら、すぐに待機状態をスキップしてインストールする
-    self.skipWaiting();
+    // ⚠️ self.skipWaiting(); はここから削除します（画面からの合図で実行するため）
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
             return cache.addAll(urlsToCache);
@@ -23,13 +19,12 @@ self.addEventListener('install', (event) => {
     );
 });
 
-// アクティベート処理（古いキャッシュの削除）
+// 2. アクティベート処理（古いキャッシュの確実な削除）
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(
                 cacheNames.map((cacheName) => {
-                    // 現在のバージョン以外の古いキャッシュを見つけたら削除する
                     if (cacheName !== CACHE_NAME) {
                         return caches.delete(cacheName);
                     }
@@ -37,17 +32,23 @@ self.addEventListener('activate', (event) => {
             );
         })
     );
-    // 新しいService Workerをすぐにページ全体に反映させる
     self.clients.claim();
 });
 
-// フェッチ処理（ネットワーク通信の制御）
+// 3. 画面側(script.js)からの「待機をスキップして！」という合図を受信する
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
+});
+
+// 4. フェッチ処理（iOSの強力なキャッシュ対策）
 self.addEventListener('fetch', (event) => {
+    // 【キャッシュファースト戦略】
+    // SWが管理する最新バージョンのキャッシュを最優先で返し、無ければネットワークへ
     event.respondWith(
-        // まずはインターネット（ネットワーク）から最新のファイルを取ろうと試みる
-        fetch(event.request).catch(() => {
-            // オフラインなどで通信に失敗したら、キャッシュからファイルを返す
-            return caches.match(event.request);
+        caches.match(event.request).then((response) => {
+            return response || fetch(event.request);
         })
     );
 });
