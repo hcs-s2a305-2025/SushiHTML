@@ -863,7 +863,7 @@ function triggerUpdateFlow(newWorker) {
                 document.removeEventListener('keydown', finishUpdate);
                 
                 //強制的にリロードさせるやつ
-                // location.reload();
+                location.reload();
             };
 
             // アニメーション完了直後の誤タップ防止
